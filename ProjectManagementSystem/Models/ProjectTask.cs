@@ -1,7 +1,7 @@
-﻿using ProjectManagementSystem.Enums;
-
-namespace ProjectManagementSystem.Models
+﻿namespace ProjectManagementSystem.Models
 {
+	using Enums;
+
 	public class ProjectTask
 	{
 		public int Id { get; set; }
