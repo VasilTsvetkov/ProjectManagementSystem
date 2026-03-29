@@ -27,11 +27,12 @@
 			return services;
 		}
 
-		public static IServiceCollection AddRepositories(this IServiceCollection services)
-		{
-			services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        public static IServiceCollection AddRepositories(this IServiceCollection services)
+        {
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IProjectRepository, ProjectRepository>();
 
-			return services;
-		}
-	}
+            return services;
+        }
+    }
 }
