@@ -1,10 +1,10 @@
 ﻿namespace ProjectManagementSystem.Repositories
 {
-	using Interfaces;
-	using Data;
-	using Microsoft.EntityFrameworkCore;
+    using Data;
+    using Interfaces;
+    using Microsoft.EntityFrameworkCore;
 
-	public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class
 	{
 		private readonly ApplicationDbContext _context;
 		private readonly DbSet<T> _dbSet;

@@ -1,8 +1,8 @@
-﻿namespace ProjectManagementSystem.ViewModels
+﻿namespace ProjectManagementSystem.ViewModels.Projects
 {
     using System.ComponentModel.DataAnnotations;
 
-    public class CreateProjectViewModel
+    public class ProjectViewModel
     {
         [Required]
         public string Name { get; set; }

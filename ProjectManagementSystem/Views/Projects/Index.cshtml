@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ProjectManagementSystem.Models.Project>
+﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Projects.ProjectListViewModel>
 
 @{
     ViewData["Title"] = "Projects";
@@ -18,6 +18,7 @@ else
     <table class="table table-hover">
         <thead>
             <tr>
+                <th>Tag</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Created At</th>
@@ -28,12 +29,14 @@ else
             @foreach (var project in Model)
             {
                 <tr>
+                    <td>@project.Tag</td>
                     <td>@project.Name</td>
                     <td>@project.Description</td>
                     <td>@project.CreatedAt.ToString("dd MMM yyyy")</td>
                     <td>
                         <a asp-action="Edit" asp-route-id="@project.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
                         <a asp-action="Delete" asp-route-id="@project.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        <a asp-controller="Tasks" asp-action="Index" asp-route-projectId="@project.Id" class="btn btn-sm btn-outline-primary">View Tasks</a>
                     </td>
                 </tr>
             }

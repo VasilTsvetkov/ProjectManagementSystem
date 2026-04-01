@@ -1,11 +1,12 @@
 ﻿namespace ProjectManagementSystem.Controllers
 {
+    using DTOs;
     using Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Models;
-    using ProjectManagementSystem.ViewModels;
+    using ViewModels.Projects;
 
     [Authorize]
     [Route("projects")]
@@ -26,8 +27,17 @@
         {
             var userId = _userManager.GetUserId(User);
             var projects = await _projectRepository.GetProjectsByUserAsync(userId);
-            
-            return View(projects);
+
+            var model = projects.Select(p => new ProjectListViewModel
+            {
+                Id = p.Id,
+                Tag = p.Tag,
+                Name = p.Name,
+                Description = p.Description,
+                CreatedAt = p.CreatedAt
+            });
+
+            return View(model);
         }
 
         [HttpGet("create")]
@@ -39,16 +49,10 @@
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Create(CreateProjectViewModel model)
+        public async Task<IActionResult> Create(ProjectViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
-
-            if (await _projectRepository.ExistsWithNameAsync(model.Name))
-            {
-                ModelState.AddModelError(nameof(model.Name), "A project with this name already exists.");
-                return View(model);
-            }
 
             var project = new Project
             {
@@ -71,9 +75,8 @@
             var project = await _projectRepository.GetByIdAsync(id);
             if (project == null) return NotFound();
 
-            var model = new EditProjectViewModel
+            var model = new ProjectViewModel
             {
-                Id = project.Id,
                 Name = project.Name,
                 Description = project.Description
             };
@@ -86,25 +89,13 @@
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Edit(int id, EditProjectViewModel model)
+        public async Task<IActionResult> Edit(int id, ProjectViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            if (await _projectRepository.ExistsWithNameAsync(model.Name, id))
-            {
-                ModelState.AddModelError(nameof(model.Name), "A project with this name already exists.");
-                return View(model);
-            }
-
-            var project = new Project
-            {
-                Id = id,
-                Name = model.Name,
-                Description = model.Description
-            };
-
             var updated = await _projectRepository.UpdateProjectAsync(id, model.Name, model.Description);
+
             if (!updated) return NotFound();
 
             return RedirectToAction(nameof(Index));
@@ -116,10 +107,17 @@
         public async Task<IActionResult> Delete(int id)
         {
             var project = await _projectRepository.GetByIdAsync(id);
-
             if (project == null) return NotFound();
 
-            return View(project);
+            var model = new ProjectDetailsViewModel
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                CreatedAt = project.CreatedAt
+            };
+
+            return View(model);
         }
 
         [HttpPost("{id}/delete")]

@@ -4,6 +4,7 @@
     using Interfaces;
     using Microsoft.EntityFrameworkCore;
     using Models;
+    using ProjectManagementSystem.Constants;
 
     public class ProjectRepository : Repository<Project>, IProjectRepository
     {
@@ -12,6 +13,14 @@
         public ProjectRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
+        }
+
+        public async Task AddAsync(Project entity)
+        {
+            var count = await _context.Projects.CountAsync();
+            entity.Tag = $"{ProjectConstants.TagPrefix}-{count + 1}";
+            await _context.Projects.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Project>> GetProjectsByUserAsync(string userId)
@@ -30,9 +39,5 @@
 
             return true;
         }
-
-        public async Task<bool> ExistsWithNameAsync(string name, int? excludeId = null)
-            => await _context.Projects
-                .AnyAsync(p => p.Name == name && (!excludeId.HasValue || p.Id != excludeId.Value));
     }
 }

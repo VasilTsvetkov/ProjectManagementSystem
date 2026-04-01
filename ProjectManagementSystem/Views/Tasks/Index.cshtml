@@ -1,0 +1,50 @@
+﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Tasks.TaskListViewModel>
+
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>@ViewBag.ProjectName</h2>
+    <a asp-action="Create" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-primary">+ New Task</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No tasks yet. Create your first one!</p>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Tag</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Deadline</th>
+                <th>Assignee</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>@task.Tag</td>
+                    <td>@task.Title</td>
+                    <td>@task.Type</td>
+                    <td>@task.Priority</td>
+                    <td>@task.Status</td>
+                    <td>@(task.Deadline?.ToString("dd MMM yyyy") ?? "-")</td>
+                    <td>@task.AssigneeEmail</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-projectId="@ViewBag.ProjectId" asp-route-id="@task.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a asp-action="Delete" asp-route-projectId="@ViewBag.ProjectId" asp-route-id="@task.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
