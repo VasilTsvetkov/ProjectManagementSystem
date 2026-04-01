@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.ViewModels.Tasks
 {
+    using Comments;
     using Enums;
 
     public class TaskDetailsViewModel
@@ -13,5 +14,7 @@
         public ProjectTaskStatus Status { get; set; }
         public DateTime? Deadline { get; set; }
         public string AssigneeEmail { get; set; }
+        public int ProjectId { get; set; }
+        public IEnumerable<CommentListViewModel> Comments { get; set; }
     }
 }

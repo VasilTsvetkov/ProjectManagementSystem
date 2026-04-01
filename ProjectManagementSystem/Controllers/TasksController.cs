@@ -8,6 +8,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Models;
+    using ViewModels.Comments;
     using ViewModels.Tasks;
 
     [Authorize]
@@ -17,11 +18,13 @@
         private readonly ITaskRepository _taskRepository;
         private readonly IProjectRepository _projectRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ICommentRepository _commentRepository;
 
-        public TasksController(ITaskRepository taskRepository, IProjectRepository projectRepository, UserManager<ApplicationUser> userManager)
+        public TasksController(ITaskRepository taskRepository, IProjectRepository projectRepository, ICommentRepository commentRepository, UserManager<ApplicationUser> userManager)
         {
             _taskRepository = taskRepository;
             _projectRepository = projectRepository;
+            _commentRepository = commentRepository;
             _userManager = userManager;
         }
 
@@ -179,6 +182,42 @@
             var deleted = await _taskRepository.DeleteAsync(id);
             if (!deleted) return NotFound();
             return RedirectToAction(nameof(Index), new { projectId });
+        }
+
+        [HttpGet("{projectId}/{id}/details")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Details(int projectId, int id)
+        {
+            var task = await _taskRepository.GetTaskByIdAsync(id);
+            if (task == null) return NotFound();
+
+            var comments = await _commentRepository.GetCommentsByTaskAsync(id);
+            var userId = _userManager.GetUserId(User);
+
+            var model = new TaskDetailsViewModel
+            {
+                Id = task.Id,
+                Tag = task.Tag,
+                Title = task.Title,
+                Description = task.Description,
+                Type = task.Type,
+                Priority = task.Priority,
+                Status = task.Status,
+                Deadline = task.Deadline,
+                AssigneeEmail = task.Assignee?.Email,
+                ProjectId = projectId,
+                Comments = comments.Select(c => new CommentListViewModel
+                {
+                    Id = c.Id,
+                    Content = c.Content,
+                    AuthorEmail = c.User?.Email,
+                    CreatedAt = c.CreatedAt,
+                    CanEdit = c.UserId == userId
+                })
+            };
+
+            return View(model);
         }
 
         private List<SelectListItem> GetUserSelectList()

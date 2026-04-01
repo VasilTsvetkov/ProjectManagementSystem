@@ -32,6 +32,7 @@
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
 
             return services;
         }
