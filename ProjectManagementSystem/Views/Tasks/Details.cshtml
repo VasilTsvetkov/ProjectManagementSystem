@@ -62,3 +62,67 @@ else
         </div>
     }
 }
+
+<hr />
+
+<h4>Time Logs <small class="text-muted fs-6">Total: @Model.FormattedTotalHours</small></h4>
+
+<form asp-controller="TimeLogs" asp-action="Create" method="post" class="mb-4">
+    <input type="hidden" name="TaskId" value="@Model.Id" />
+    <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+    <div class="row g-2 align-items-end">
+        <div class="col-auto">
+            <label class="form-label">Days</label>
+            <input type="number" name="Days" min="0" max="99" value="0" class="form-control" style="width:80px" />
+        </div>
+        <div class="col-auto">
+            <label class="form-label">Hours</label>
+            <input type="number" name="Hours" min="0" max="23" value="0" class="form-control" style="width:80px" />
+        </div>
+        <div class="col-auto">
+            <label class="form-label">Minutes</label>
+            <input type="number" name="Minutes" min="0" max="59" value="0" class="form-control" style="width:80px" />
+        </div>
+        <div class="col-auto">
+            <label class="form-label">Date</label>
+            <input type="date" name="Date" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col">
+            <label class="form-label">Description</label>
+            <input type="text" name="Description" class="form-control" placeholder="Optional..." />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Log Time</button>
+        </div>
+    </div>
+</form>
+
+@if (!Model.TimeLogs.Any())
+{
+    <p class="text-muted">No time logged yet.</p>
+}
+else
+{
+    @foreach (var log in Model.TimeLogs)
+    {
+        <div class="card mb-2">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@log.FormattedHours</strong> — @log.Date.ToString("dd MMM yyyy")
+                    @if (!string.IsNullOrEmpty(log.Description))
+                    {
+                        <span class="text-muted"> — @log.Description</span>
+                    }
+                    <br />
+                    <small class="text-muted">@log.UserEmail</small>
+                </div>
+                @if (log.CanEdit)
+                {
+                    <form asp-controller="TimeLogs" asp-action="Delete" asp-route-id="@log.Id" asp-route-projectId="@Model.ProjectId" method="post">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                }
+            </div>
+        </div>
+    }
+}

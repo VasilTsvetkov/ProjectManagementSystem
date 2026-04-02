@@ -10,6 +10,7 @@
     using Models;
     using ViewModels.Comments;
     using ViewModels.Tasks;
+    using ViewModels.TimeLogs;
 
     [Authorize]
     [Route("tasks")]
@@ -19,12 +20,14 @@
         private readonly IProjectRepository _projectRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICommentRepository _commentRepository;
+        private readonly ITimeLogRepository _timeLogRepository;
 
-        public TasksController(ITaskRepository taskRepository, IProjectRepository projectRepository, ICommentRepository commentRepository, UserManager<ApplicationUser> userManager)
+        public TasksController(ITaskRepository taskRepository, IProjectRepository projectRepository, ICommentRepository commentRepository, ITimeLogRepository timeLogRepository, UserManager<ApplicationUser> userManager)
         {
             _taskRepository = taskRepository;
             _projectRepository = projectRepository;
             _commentRepository = commentRepository;
+            _timeLogRepository = timeLogRepository;
             _userManager = userManager;
         }
 
@@ -193,6 +196,7 @@
             if (task == null) return NotFound();
 
             var comments = await _commentRepository.GetCommentsByTaskAsync(id);
+            var timeLogs = await _timeLogRepository.GetTimeLogsByTaskAsync(id);
             var userId = _userManager.GetUserId(User);
 
             var model = new TaskDetailsViewModel
@@ -214,7 +218,17 @@
                     AuthorEmail = c.User?.Email,
                     CreatedAt = c.CreatedAt,
                     CanEdit = c.UserId == userId
-                })
+                }),
+                TimeLogs = timeLogs.Select(t => new TimeLogListViewModel
+                {
+                    Id = t.Id,
+                    Hours = t.Hours,
+                    Date = t.Date,
+                    Description = t.Description,
+                    UserEmail = t.User?.Email,
+                    CanEdit = t.UserId == userId
+                }),
+                TotalHours = timeLogs.Sum(t => t.Hours)
             };
 
             return View(model);

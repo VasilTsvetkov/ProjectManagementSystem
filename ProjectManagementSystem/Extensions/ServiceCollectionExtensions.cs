@@ -33,6 +33,7 @@
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
+            services.AddScoped<ITimeLogRepository, TimeLogRepository>();
 
             return services;
         }
