@@ -50,7 +50,8 @@
                 Priority = t.Priority,
                 Status = t.Status,
                 Deadline = t.Deadline,
-                AssigneeEmail = t.Assignee?.Email
+                AssigneeEmail = t.Assignee?.Email,
+                AssigneeName = GetAssigneeName(t.Assignee)
             });
 
             ViewBag.ProjectId = projectId;
@@ -147,7 +148,6 @@
             };
 
             var updated = await _taskRepository.UpdateTaskAsync(id, dto);
-
             if (!updated) return NotFound();
 
             return RedirectToAction(nameof(Index), new { projectId });
@@ -171,7 +171,8 @@
                 Priority = task.Priority,
                 Status = task.Status,
                 Deadline = task.Deadline,
-                AssigneeEmail = task.Assignee?.Email
+                AssigneeEmail = task.Assignee?.Email,
+                AssigneeName = GetAssigneeName(task.Assignee)
             };
 
             return View(model);
@@ -210,6 +211,7 @@
                 Status = task.Status,
                 Deadline = task.Deadline,
                 AssigneeEmail = task.Assignee?.Email,
+                AssigneeName = GetAssigneeName(task.Assignee),
                 ProjectId = projectId,
                 Comments = comments.Select(c => new CommentListViewModel
                 {
@@ -234,12 +236,55 @@
             return View(model);
         }
 
+        [HttpPost("{projectId}/{id}/status")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateStatus(int projectId, int id, [FromBody] ProjectTaskStatus status)
+        {
+            var updated = await _taskRepository.UpdateStatusAsync(id, status);
+            if (!updated) return NotFound();
+            return Ok();
+        }
+
+        [HttpGet("{projectId}/board")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Board(int projectId)
+        {
+            var project = await _projectRepository.GetByIdAsync(projectId);
+            if (project == null) return NotFound();
+
+            var tasks = await _taskRepository.GetTasksByProjectAsync(projectId);
+
+            ViewBag.ProjectId = projectId;
+            ViewBag.ProjectName = project.Name;
+            ViewBag.ProjectTag = project.Tag;
+
+            var model = tasks.Select(t => new TaskListViewModel
+            {
+                Id = t.Id,
+                Tag = t.Tag,
+                Title = t.Title,
+                Type = t.Type,
+                Priority = t.Priority,
+                Status = t.Status,
+                Deadline = t.Deadline,
+                AssigneeEmail = t.Assignee?.Email,
+                AssigneeName = GetAssigneeName(t.Assignee)
+            });
+
+            return View(model);
+        }
+
         private List<SelectListItem> GetUserSelectList()
             => _userManager.Users
                 .Select(u => new SelectListItem
                 {
                     Value = u.Id,
-                    Text = u.Email
+                    Text = $"{u.FirstName} {u.LastName}"
                 }).ToList();
+
+        private string? GetAssigneeName(ApplicationUser? assignee)
+            => assignee != null ? $"{assignee.FirstName} {assignee.LastName}" : null;
     }
 }

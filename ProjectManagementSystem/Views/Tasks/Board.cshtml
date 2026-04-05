@@ -1,0 +1,88 @@
+﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Tasks.TaskListViewModel>
+@using ProjectManagementSystem.Enums
+@using ProjectManagementSystem.Helpers
+
+@{
+    ViewData["Title"] = "Board";
+    var statuses = Enum.GetValues<ProjectTaskStatus>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>@ViewBag.ProjectName - Board</h2>
+    <a asp-action="Index" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-outline-secondary">List View</a>
+</div>
+
+<div class="d-flex gap-3 overflow-auto pb-3">
+    @foreach (var status in statuses)
+    {
+        <div class="flex-shrink-0" style="width: 280px;">
+            <div class="card">
+                <div class="card-header fw-bold">@status.GetDisplayName()</div>
+                <div class="card-body kanban-column p-2"
+                     data-status="@((int)status)"
+                     style="min-height: 400px;">
+                    @foreach (var task in Model.Where(t => t.Status == status))
+                    {
+                        <div class="card mb-2 task-card" data-id="@task.Id" style="cursor: grab;">
+                            <div class="card-body p-2">
+                                <div class="mb-1">@task.Title</div>
+                                <div class="mb-2">
+                                    <a asp-controller="Projects" asp-action="Index"
+                                       class="badge text-decoration-none"
+                                       style="background-color: @ColorHelper.GetProjectColor(ViewBag.ProjectTag as string ?? ""); color: white; font-size: 0.7rem;">
+                                        @ViewBag.ProjectName
+                                    </a>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a asp-controller="Tasks" asp-action="Details"
+                                       asp-route-projectId="@ViewBag.ProjectId"
+                                       asp-route-id="@task.Id"
+                                       class="text-muted fw-bold text-decoration-none"
+                                       style="font-size: 0.8rem;">
+                                        @task.TypeIcon @task.Tag
+                                    </a>
+                                    @if (task.AssigneeName != null)
+                                    {
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                             style="width:28px; height:28px; font-size:0.7rem;"
+                                             title="@task.AssigneeName">
+                                            @task.AssigneeName.Substring(0, 1).ToUpper()
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded-circle border d-flex align-items-center justify-content-center"
+                                             style="width:28px; height:28px;">
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        document.querySelectorAll('.kanban-column').forEach(column => {
+            new Sortable(column, {
+                group: 'kanban',
+                animation: 150,
+                onEnd: async function (evt) {
+                    const taskId = evt.item.dataset.id;
+                    const newStatus = evt.to.dataset.status;
+
+                    await fetch(`/tasks/@ViewBag.ProjectId/${taskId}/status`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(parseInt(newStatus))
+                    });
+                }
+            });
+        });
+    </script>
+}

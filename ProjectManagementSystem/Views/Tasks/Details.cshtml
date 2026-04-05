@@ -1,11 +1,12 @@
 ﻿@model ProjectManagementSystem.ViewModels.Tasks.TaskDetailsViewModel
+@using ProjectManagementSystem.Helpers
 
 @{
     ViewData["Title"] = Model.Tag;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>@Model.Tag — @Model.Title</h2>
+    <h2>@Model.TypeIcon @Model.Tag - @Model.Title</h2>
     <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-outline-secondary">Back to Tasks</a>
 </div>
 
@@ -17,51 +18,12 @@
     <dt class="col-sm-2">Priority</dt>
     <dd class="col-sm-10">@Model.Priority</dd>
     <dt class="col-sm-2">Status</dt>
-    <dd class="col-sm-10">@Model.Status</dd>
+    <dd class="col-sm-10">@Model.Status.GetDisplayName()</dd>
     <dt class="col-sm-2">Deadline</dt>
     <dd class="col-sm-10">@(Model.Deadline?.ToString("dd MMM yyyy") ?? "-")</dd>
     <dt class="col-sm-2">Assignee</dt>
-    <dd class="col-sm-10">@(Model.AssigneeEmail ?? "Unassigned")</dd>
+    <dd class="col-sm-10">@(Model.AssigneeName ?? "Unassigned")</dd>
 </dl>
-
-<hr />
-
-<h4>Comments</h4>
-
-<form asp-controller="Comments" asp-action="Create" method="post" class="mb-4">
-    <input type="hidden" name="TaskId" value="@Model.Id" />
-    <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
-    <div class="mb-3">
-        <textarea name="Content" class="form-control" rows="3" placeholder="Add a comment..."></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Add Comment</button>
-</form>
-
-@if (!Model.Comments.Any())
-{
-    <p class="text-muted">No comments yet.</p>
-}
-else
-{
-    @foreach (var comment in Model.Comments)
-    {
-        <div class="card mb-2">
-            <div class="card-body">
-                <p>@comment.Content</p>
-                <small class="text-muted">@comment.AuthorEmail — @comment.CreatedAt.ToString("dd MMM yyyy HH:mm")</small>
-                @if (comment.CanEdit)
-                {
-                    <div class="mt-2">
-                        <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <form asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.Id" asp-route-projectId="@Model.ProjectId" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                        </form>
-                    </div>
-                }
-            </div>
-        </div>
-    }
-}
 
 <hr />
 
@@ -121,6 +83,45 @@ else
                     <form asp-controller="TimeLogs" asp-action="Delete" asp-route-id="@log.Id" asp-route-projectId="@Model.ProjectId" method="post">
                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                     </form>
+                }
+            </div>
+        </div>
+    }
+}
+
+<hr />
+
+<h4>Comments</h4>
+
+<form asp-controller="Comments" asp-action="Create" method="post" class="mb-4">
+    <input type="hidden" name="TaskId" value="@Model.Id" />
+    <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+    <div class="mb-3">
+        <textarea name="Content" class="form-control" rows="3" placeholder="Add a comment..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Comment</button>
+</form>
+
+@if (!Model.Comments.Any())
+{
+    <p class="text-muted">No comments yet.</p>
+}
+else
+{
+    @foreach (var comment in Model.Comments)
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+                <p>@comment.Content</p>
+                <small class="text-muted">@comment.AuthorEmail - @comment.CreatedAt.ToString("dd MMM yyyy HH:mm")</small>
+                @if (comment.CanEdit)
+                {
+                    <div class="mt-2">
+                        <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.Id" asp-route-projectId="@Model.ProjectId" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </div>
                 }
             </div>
         </div>

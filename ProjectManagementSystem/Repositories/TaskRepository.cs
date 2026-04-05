@@ -66,6 +66,16 @@
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> UpdateStatusAsync(int id, ProjectTaskStatus status)
+        {
+            var existing = await _context.Tasks.FindAsync(id);
+            if (existing == null) return false;
+
+            existing.Status = status;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<ProjectTask?> GetTaskByIdAsync(int id)
             => await _context.Tasks
                 .Include(t => t.Assignee)
