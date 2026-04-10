@@ -29,7 +29,9 @@ else
             @foreach (var project in Model)
             {
                 <tr>
-                    <td>@project.Tag</td>
+                    <td>
+                        <partial name="_ProjectTag" model="@project.Tag" />
+                    </td>
                     <td>@project.Name</td>
                     <td>@project.Description</td>
                     <td>@project.CreatedAt.ToString("dd MMM yyyy")</td>

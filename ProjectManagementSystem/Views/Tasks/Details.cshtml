@@ -6,7 +6,9 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>@Model.TypeIcon @Model.Tag - @Model.Title</h2>
+    <h2>
+        <partial name="_TaskTag" model="Model" /> - @Model.Title
+    </h2>
     <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-outline-secondary">Back to Tasks</a>
 </div>
 
@@ -70,13 +72,13 @@ else
         <div class="card mb-2">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
-                    <strong>@log.FormattedHours</strong> — @log.Date.ToString("dd MMM yyyy")
+                    <strong>@log.FormattedHours</strong> - @log.Date.ToString("dd MMM yyyy")
                     @if (!string.IsNullOrEmpty(log.Description))
                     {
                         <span class="text-muted"> — @log.Description</span>
                     }
                     <br />
-                    <small class="text-muted">@log.UserEmail</small>
+                    <small class="text-muted">@log.UserName</small>
                 </div>
                 @if (log.CanEdit)
                 {
@@ -113,7 +115,7 @@ else
         <div class="card mb-2">
             <div class="card-body">
                 <p>@comment.Content</p>
-                <small class="text-muted">@comment.AuthorEmail - @comment.CreatedAt.ToString("dd MMM yyyy HH:mm")</small>
+                <small class="text-muted">@comment.AuthorName - @comment.CreatedAt.ToString("dd MMM yyyy HH:mm")</small>
                 @if (comment.CanEdit)
                 {
                     <div class="mt-2">

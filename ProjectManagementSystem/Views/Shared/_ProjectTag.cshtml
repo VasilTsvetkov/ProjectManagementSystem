@@ -1,0 +1,9 @@
+﻿@model string
+
+@using ProjectManagementSystem.Helpers
+
+@{
+    var color = ColorHelper.GetProjectColor(Model);
+}
+
+<span class="badge" style="background-color: @color">@Model</span>

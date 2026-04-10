@@ -9,9 +9,9 @@
     {
         public static string GetTypeIcon(TaskType type) => type switch
         {
-            TaskType.Bug => TaskConstants.BugIcon,
-            TaskType.Feature => TaskConstants.FeatureIcon,
-            TaskType.Task => TaskConstants.TaskIcon,
+            TaskType.Bug => TaskConstants.Icons[TaskConstants.BugPrefix],
+            TaskType.Feature => TaskConstants.Icons[TaskConstants.FeaturePrefix],
+            TaskType.Task => TaskConstants.Icons[TaskConstants.TaskPrefix],
             _ => ""
         };
 

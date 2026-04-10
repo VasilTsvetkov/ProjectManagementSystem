@@ -217,7 +217,7 @@
                 {
                     Id = c.Id,
                     Content = c.Content,
-                    AuthorEmail = c.User?.Email,
+                    AuthorName = $"{c.User.FirstName} {c.User.LastName}",
                     CreatedAt = c.CreatedAt,
                     CanEdit = c.UserId == userId
                 }),
@@ -227,7 +227,7 @@
                     Hours = t.Hours,
                     Date = t.Date,
                     Description = t.Description,
-                    UserEmail = t.User?.Email,
+                    UserName = $"{t.User.FirstName} {t.User.LastName}",
                     CanEdit = t.UserId == userId
                 }),
                 TotalHours = timeLogs.Sum(t => t.Hours)

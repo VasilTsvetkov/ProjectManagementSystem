@@ -1,0 +1,118 @@
+﻿@model ProjectManagementSystem.ViewModels.Dashboard.DashboardViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Dashboard - @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Model.Month) @Model.Year</h2>
+        </div>
+    </div>
+
+    <form method="get" asp-controller="Dashboard" asp-action="Index" class="mb-4">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Month</label>
+                <select name="month" class="form-select" asp-items="Model.AvailableMonths">
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Year</label>
+                <select name="year" class="form-select" asp-items="Model.AvailableYears">
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Apply Filter</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Total Hours</h5>
+                    <h2 class="card-text">@Model.Stats.TotalHours.ToString("F1")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Projects</h5>
+                    <h2 class="card-text">@Model.Stats.TotalProjects</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Tasks</h5>
+                    <h2 class="card-text">@Model.Stats.TotalTasks</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Time Logs</h5>
+                    <h2 class="card-text">@Model.Stats.TotalLogs</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Time Breakdown by Project</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.ProjectBreakdown.Any())
+                    {
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Tag</th>
+                                    <th>Total Hours</th>
+                                    <th>Tasks</th>
+                                    <th>Logs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var project in Model.ProjectBreakdown)
+                                {
+                                    <tr>
+                                        <td>@project.ProjectName</td>
+                                        <td>
+                                            <partial name="_ProjectTag" model="@project.ProjectTag" />
+                                        </td>
+                                        <td><strong>@project.TotalHours.ToString("F1")</strong></td>
+                                        <td>@project.TaskCount</td>
+                                        <td>@project.LogCount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No time logged for this period.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelector('select[name="month"]').value = '@Model.Month';
+        document.querySelector('select[name="year"]').value = '@Model.Year';
+    </script>
+}

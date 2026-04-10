@@ -7,8 +7,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>@ViewBag.ProjectName</h2>
-    <a asp-action="Create" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-primary">+ New Task</a>
-    <a asp-action="Board" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-outline-primary">Board View</a>
+    <div>
+        <a asp-action="Board" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-outline-primary">Board View</a>
+        <a asp-action="Create" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-primary">+ New Task</a>
+    </div>
 </div>
 
 @if (!Model.Any())
@@ -36,8 +38,8 @@ else
                 <tr>
                     <td>
                         <a asp-action="Details" asp-route-projectId="@ViewBag.ProjectId" asp-route-id="@task.Id"
-                           class="text-decoration-none fw-bold">
-                            @task.TypeIcon @task.Tag
+                           class="text-decoration-none">
+                            <partial name="_TaskTag" model="task" />
                         </a>
                     </td>
                     <td>@task.Title</td>
