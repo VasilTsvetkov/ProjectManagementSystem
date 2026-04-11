@@ -1,27 +1,47 @@
 namespace ProjectManagementSystem
 {
     using Extensions;
+    using Serilog;
 
     public class Program
     {
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            ServiceCollectionExtensions.ConfigureSerilog();
 
-            builder.Services.AddDatabase(builder.Configuration);
-            builder.Services.AddIdentityServices();
-            builder.Services.AddRepositories();
-            builder.Services.AddControllersWithViews();
-
-            var app = builder.Build();
-
-            using (var scope = app.Services.CreateScope())
+            try
             {
-                await scope.ServiceProvider.SeedRolesAndAdminAsync();
-            }
+                Log.Information("Starting Application");
 
-            app.UseMiddlewarePipeline();
-            app.Run();
+                var builder = WebApplication.CreateBuilder(args);
+                builder.Host.UseSerilog();
+
+                builder.Services.AddDatabase(builder.Configuration);
+                builder.Services.AddIdentityServices();
+                builder.Services.AddRepositories();
+                builder.Services.AddControllersWithViews();
+
+                var app = builder.Build();
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    await scope.ServiceProvider.SeedRolesAndAdminAsync();
+                }
+
+                app.UseMiddlewarePipeline();
+
+                Log.Information("Application started successfully");
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application failed to start");
+                throw;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }
