@@ -1,0 +1,76 @@
+﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Admin.UserRoleViewModel>
+@using ProjectManagementSystem.Enums
+@using ProjectManagementSystem.Helpers
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="container mt-4">
+    <h2>User Management</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Current Role</th>
+                <th>Change Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>
+                        @if (user.IsAdmin)
+                        {
+                            <span class="badge bg-danger">@user.CurrentRole</span>
+                        }
+                        else if (user.CurrentRole == UserRole.Manager.ToRoleName())
+                        {
+                            <span class="badge bg-warning">@user.CurrentRole</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@user.CurrentRole</span>
+                        }
+                    </td>
+                    <td>
+                        @if (user.IsAdmin)
+                        {
+                            <span class="text-muted">Cannot change Admin role</span>
+                        }
+                        else
+                        {
+                            <form asp-action="ChangeRole" asp-route-userId="@user.UserId" method="post" class="d-inline">
+                                <select name="newRole" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                                    <option value="@UserRole.Member.ToRoleName()" selected="@(user.CurrentRole == UserRole.Member.ToRoleName())">Member</option>
+                                    <option value="@UserRole.Manager.ToRoleName()" selected="@(user.CurrentRole == UserRole.Manager.ToRoleName())">Manager</option>
+                                </select>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

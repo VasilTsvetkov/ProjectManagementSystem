@@ -56,7 +56,11 @@ else
                         @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Manager))
                         {
                             <a asp-action="Edit" asp-route-projectId="@ViewBag.ProjectId" asp-route-id="@task.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                            <a asp-action="Delete" asp-route-projectId="@ViewBag.ProjectId" asp-route-id="@task.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="confirmDelete('@Url.Action("DeleteConfirmed", "Tasks", new { projectId = ViewBag.ProjectId, id = task.Id })', '@task.Title', 'task')">
+                                Delete
+                            </button>
                         }
                     </td>
                 </tr>

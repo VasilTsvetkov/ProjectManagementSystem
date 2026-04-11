@@ -3,6 +3,7 @@
 	using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore;
 	using Models;
+    using System.Reflection.Emit;
 
 	public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 	{
@@ -49,6 +50,21 @@
 				.WithMany(u => u.Tasks)
 				.HasForeignKey(t => t.AssigneeId)
 				.OnDelete(DeleteBehavior.NoAction);
-		}
+
+            builder.Entity<ProjectTask>()
+               .HasMany(t => t.Comments)
+               .WithOne(c => c.Task)
+               .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ProjectTask>()
+                .HasMany(t => t.TimeLogs)
+                .WithOne(tl => tl.Task)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Project>()
+                .HasMany(p => p.Tasks)
+                .WithOne(t => t.Project)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
 	}
 }
