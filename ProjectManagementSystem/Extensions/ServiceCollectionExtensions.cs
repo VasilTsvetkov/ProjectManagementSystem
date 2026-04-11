@@ -37,5 +37,13 @@
 
             return services;
         }
+
+        public static async Task SeedRolesAndAdminAsync(this IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            await RoleSeeder.SeedRolesAsync(roleManager, userManager);
+        }
     }
 }

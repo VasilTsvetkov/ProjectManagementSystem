@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.Controllers
 {
+    using Constants;
     using DTOs;
     using Enums;
     using Interfaces;
@@ -61,6 +62,7 @@
         }
 
         [HttpGet("{projectId}/create")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult Create(int projectId)
         {
@@ -72,6 +74,7 @@
         }
 
         [HttpPost("{projectId}/create")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -101,6 +104,7 @@
         }
 
         [HttpGet("{projectId}/{id}/edit")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Edit(int projectId, int id)
@@ -124,6 +128,7 @@
         }
 
         [HttpPost("{projectId}/{id}/edit")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -154,6 +159,7 @@
         }
 
         [HttpGet("{projectId}/{id}/delete")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int projectId, int id)
@@ -179,6 +185,7 @@
         }
 
         [HttpPost("{projectId}/{id}/delete")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteConfirmed(int projectId, int id)

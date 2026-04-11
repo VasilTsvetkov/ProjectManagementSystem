@@ -1,6 +1,6 @@
 ﻿namespace ProjectManagementSystem.Controllers
 {
-    using DTOs;
+    using Constants;
     using Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
@@ -25,8 +25,7 @@
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Index()
         {
-            var userId = _userManager.GetUserId(User);
-            var projects = await _projectRepository.GetProjectsByUserAsync(userId);
+            var projects = await _projectRepository.GetAllAsync();
 
             var model = projects.Select(p => new ProjectListViewModel
             {
@@ -41,11 +40,13 @@
         }
 
         [HttpGet("create")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult Create()
             => View();
 
         [HttpPost("create")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -68,6 +69,7 @@
         }
 
         [HttpGet("{id}/edit")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Edit(int id)
@@ -85,6 +87,7 @@
         }
 
         [HttpPost("{id}/edit")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -102,6 +105,7 @@
         }
 
         [HttpGet("{id}/delete")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
@@ -121,6 +125,7 @@
         }
 
         [HttpPost("{id}/delete")]
+        [Authorize(Roles = Roles.AdminOrManager)]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteConfirmed(int id)

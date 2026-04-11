@@ -1,5 +1,7 @@
 ﻿namespace ProjectManagementSystem.Areas.Identity.Pages.Account
 {
+    using Enums;
+    using Helpers;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Identity.UI.Services;
@@ -94,6 +96,9 @@
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
+
+                await _userManager.AddToRoleAsync(user, UserRole.Member.ToRoleName());
+
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return LocalRedirect(returnUrl);
             }

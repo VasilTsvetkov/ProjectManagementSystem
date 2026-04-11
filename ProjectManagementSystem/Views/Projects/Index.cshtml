@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Projects.ProjectListViewModel>
+@using ProjectManagementSystem.Constants
 
 @{
     ViewData["Title"] = "Projects";
@@ -6,7 +7,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Projects</h2>
-    <a asp-action="Create" class="btn btn-primary">+ New Project</a>
+    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Manager))
+    {
+        <a asp-action="Create" class="btn btn-primary">+ New Project</a>
+    }
 </div>
 
 @if (!Model.Any())
@@ -36,8 +40,11 @@ else
                     <td>@project.Description</td>
                     <td>@project.CreatedAt.ToString("dd MMM yyyy")</td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@project.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@project.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Manager))
+                        {
+                            <a asp-action="Edit" asp-route-id="@project.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@project.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        }
                         <a asp-controller="Tasks" asp-action="Index" asp-route-projectId="@project.Id" class="btn btn-sm btn-outline-primary">View Tasks</a>
                     </td>
                 </tr>

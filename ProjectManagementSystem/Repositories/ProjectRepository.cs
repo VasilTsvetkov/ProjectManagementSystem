@@ -23,11 +23,6 @@
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Project>> GetProjectsByUserAsync(string userId)
-            => await _context.Projects
-                .Where(p => p.CreatedByUserId == userId)
-                .ToListAsync();
-
         public async Task<bool> UpdateProjectAsync(int id, string name, string description)
         {
             var existing = await _context.Projects.FindAsync(id);
