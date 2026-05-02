@@ -1,22 +1,18 @@
 namespace ProjectManagementSystem
 {
     using Extensions;
+    using Middleware;
     using Serilog;
 
     public class Program
     {
-        private static readonly ILogger _logger = Log.Logger;
-
         public static async Task Main(string[] args)
         {
-            ServiceCollectionExtensions.ConfigureSerilog();
-
             try
             {
-                _logger.Information("Starting Application");
-
                 var builder = WebApplication.CreateBuilder(args);
-                builder.Host.UseSerilog();
+
+                builder.Host.ConfigureSerilog();
 
                 builder.Services.AddDatabase(builder.Configuration);
                 builder.Services.AddIdentityServices();
@@ -26,6 +22,8 @@ namespace ProjectManagementSystem
 
                 var app = builder.Build();
 
+                app.UseMiddleware<ExceptionHandlingMiddleware>();
+
                 using (var scope = app.Services.CreateScope())
                 {
                     await scope.ServiceProvider.SeedRolesAndAdminAsync();
@@ -33,13 +31,13 @@ namespace ProjectManagementSystem
 
                 app.UseMiddlewarePipeline();
 
-                _logger.Information("Application started successfully");
+                Log.Information("Application started successfully");
+
                 app.Run();
             }
             catch (Exception ex)
             {
-                _logger.Fatal(ex, "Application failed to start");
-                throw;
+                Log.Fatal(ex, "Application terminated unexpectedly during startup");
             }
             finally
             {

@@ -18,83 +18,75 @@
 
         public async Task<bool> CreateCommentAsync(CommentViewModel model, string userId)
         {
-            try
+            var comment = new Comment
             {
-                _logger.LogInformation("Creating comment for task {TaskId} by user {UserId}", model.TaskId, userId);
-                var comment = new Comment
-                {
-                    Content = model.Content,
-                    TaskId = model.TaskId,
-                    UserId = userId,
-                    CreatedAt = DateTime.UtcNow
-                };
-                await _commentRepository.AddAsync(comment);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating comment");
-                throw;
-            }
+                Content = model.Content,
+                TaskId = model.TaskId,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _commentRepository.AddAsync(comment);
+
+            _logger.LogInformation("User {UserId} added a comment to Task {TaskId}", userId, model.TaskId);
+
+            return true;
         }
 
         public async Task<CommentViewModel?> GetCommentForEditAsync(int id, string userId)
         {
-            try
-            {
-                var comment = await _commentRepository.GetByIdAsync(id);
-                if (comment == null || comment.UserId != userId)
-                {
-                    _logger.LogWarning("Comment {Id} not found or unauthorized for user {UserId}", id, userId);
-                    return null;
-                }
+            var comment = await _commentRepository.GetByIdAsync(id);
 
-                return new CommentViewModel
-                {
-                    Content = comment.Content,
-                    TaskId = comment.TaskId,
-                    ProjectId = comment.Task.ProjectId
-                };
-            }
-            catch (Exception ex)
+            if (comment == null || comment.UserId != userId)
             {
-                _logger.LogError(ex, "Error fetching comment {Id} for edit", id);
-                throw;
+                return null;
             }
+
+            return new CommentViewModel
+            {
+                Content = comment.Content,
+                TaskId = comment.TaskId,
+                ProjectId = comment.Task.ProjectId
+            };
         }
 
         public async Task<bool> UpdateCommentAsync(int id, CommentViewModel model, string userId)
         {
-            try
-            {
-                var comment = await _commentRepository.GetByIdAsync(id);
-                if (comment == null || comment.UserId != userId) return false;
+            var comment = await _commentRepository.GetByIdAsync(id);
 
-                return await _commentRepository.UpdateCommentAsync(id, model.Content);
-            }
-            catch (Exception ex)
+            if (comment == null || comment.UserId != userId)
             {
-                _logger.LogError(ex, "Error updating comment {Id}", id);
-                throw;
+                return false;
             }
+
+            var result = await _commentRepository.UpdateCommentAsync(id, model.Content);
+
+            if (result)
+            {
+                _logger.LogInformation("Comment {CommentId} updated by user {UserId}", id, userId);
+            }
+
+            return result;
         }
 
         public async Task<(bool Success, int TaskId)?> DeleteCommentAsync(int id, string userId)
         {
-            try
-            {
-                var comment = await _commentRepository.GetByIdAsync(id);
-                if (comment == null || comment.UserId != userId) return null;
+            var comment = await _commentRepository.GetByIdAsync(id);
 
-                var taskId = comment.TaskId;
-                var deleted = await _commentRepository.DeleteAsync(id);
-                return deleted ? (true, taskId) : null;
-            }
-            catch (Exception ex)
+            if (comment == null || comment.UserId != userId)
             {
-                _logger.LogError(ex, "Error deleting comment {Id}", id);
-                throw;
+                return null;
             }
+
+            var taskId = comment.TaskId;
+            var deleted = await _commentRepository.DeleteAsync(id);
+
+            if (deleted)
+            {
+                _logger.LogInformation("Comment {CommentId} deleted from Task {TaskId} by user {UserId}", id, taskId, userId);
+            }
+
+            return deleted ? (true, taskId) : null;
         }
     }
 }

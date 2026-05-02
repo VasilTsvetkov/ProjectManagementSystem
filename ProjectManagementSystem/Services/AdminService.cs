@@ -20,75 +20,59 @@
 
         public async Task<IEnumerable<UserRoleViewModel>> GetAllUsersWithRolesAsync()
         {
-            try
+            var users = _userManager.Users.ToList();
+            var userViewModels = new List<UserRoleViewModel>();
+
+            foreach (var user in users)
             {
-                _logger.LogInformation("Fetching all users with roles");
+                var roles = await _userManager.GetRolesAsync(user);
+                var currentRole = roles.FirstOrDefault() ?? UserRole.Member.ToRoleName();
 
-                var users = _userManager.Users.ToList();
-                var userViewModels = new List<UserRoleViewModel>();
-
-                foreach (var user in users)
+                userViewModels.Add(new UserRoleViewModel
                 {
-                    var roles = await _userManager.GetRolesAsync(user);
-                    var currentRole = roles.FirstOrDefault() ?? UserRole.Member.ToRoleName();
-
-                    userViewModels.Add(new UserRoleViewModel
-                    {
-                        UserId = user.Id,
-                        Email = user.Email ?? "No Email Provided",
-                        FullName = UserDisplayNameHelper.GetFullName(user),
-                        CurrentRole = currentRole,
-                        IsAdmin = currentRole == UserRole.Admin.ToRoleName()
-                    });
-                }
-
-                _logger.LogInformation("Fetched {Count} users", userViewModels.Count);
-                return userViewModels;
+                    UserId = user.Id,
+                    Email = user.Email ?? "No Email Provided",
+                    FullName = UserDisplayNameHelper.GetFullName(user),
+                    CurrentRole = currentRole,
+                    IsAdmin = currentRole == UserRole.Admin.ToRoleName()
+                });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching users with roles");
-                throw;
-            }
+
+            return userViewModels;
         }
 
         public async Task<(bool Success, string Message)> ChangeUserRoleAsync(string userId, string newRole)
         {
-            try
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
             {
-                _logger.LogInformation("Changing role for user {UserId} to {NewRole}", userId, newRole);
+                _logger.LogWarning("Role change failed: User {UserId} not found", userId);
+                return (false, "User not found");
+            }
 
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
-                {
-                    _logger.LogWarning("User {UserId} not found", userId);
-                    return (false, "User not found");
-                }
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            var currentRole = currentRoles.FirstOrDefault();
 
-                var currentRoles = await _userManager.GetRolesAsync(user);
-                var currentRole = currentRoles.FirstOrDefault();
+            if (currentRole == UserRole.Admin.ToRoleName())
+            {
+                _logger.LogWarning("Security Alert: Unauthorized attempt to change Admin role for {Email}", user.Email);
+                return (false, "Cannot change Admin role.");
+            }
 
-                if (currentRole == UserRole.Admin.ToRoleName())
-                {
-                    _logger.LogWarning("Attempted to change Admin role for user {UserId}", userId);
-                    return (false, "Cannot change Admin role.");
-                }
+            if (currentRole != null)
+            {
+                await _userManager.RemoveFromRoleAsync(user, currentRole);
+            }
 
-                if (currentRole != null)
-                {
-                    await _userManager.RemoveFromRoleAsync(user, currentRole);
-                }
+            var result = await _userManager.AddToRoleAsync(user, newRole);
 
-                await _userManager.AddToRoleAsync(user, newRole);
-
-                _logger.LogInformation("Successfully changed role to {NewRole} for user {Email}", newRole, user.Email);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("Role changed: {Email} updated from {OldRole} to {NewRole}", user.Email, currentRole, newRole);
                 return (true, $"Role changed to {newRole} for {user.Email}");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error changing role for user {UserId}", userId);
-                throw;
-            }
+
+            return (false, "Failed to update role");
         }
     }
 }

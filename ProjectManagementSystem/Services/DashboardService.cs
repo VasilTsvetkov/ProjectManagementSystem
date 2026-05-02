@@ -20,35 +20,25 @@
 
         public async Task<DashboardViewModel> GetDashboardDataAsync(int? year, int? month, string userId)
         {
-            try
+            var selectedYear = year ?? DateTime.Now.Year;
+            var selectedMonth = month ?? DateTime.Now.Month;
+
+            var stats = await _timeLogRepository.GetMonthlyStatsAsync(selectedYear, selectedMonth, userId);
+            var projectBreakdown = await _timeLogRepository.GetProjectBreakdownAsync(selectedYear, selectedMonth, userId);
+
+            return new DashboardViewModel
             {
-                _logger.LogInformation("Fetching dashboard stats for user {UserId}", userId);
-
-                var selectedYear = year ?? DateTime.Now.Year;
-                var selectedMonth = month ?? DateTime.Now.Month;
-
-                var stats = await _timeLogRepository.GetMonthlyStatsAsync(selectedYear, selectedMonth, userId);
-                var projectBreakdown = await _timeLogRepository.GetProjectBreakdownAsync(selectedYear, selectedMonth, userId);
-
-                return new DashboardViewModel
-                {
-                    Year = selectedYear,
-                    Month = selectedMonth,
-                    SelectedUserId = userId,
-                    Stats = stats,
-                    ProjectBreakdown = projectBreakdown.ToList(),
-                    UserBreakdown = new List<UserTimeDto>(),
-                    AvailableMonths = GetMonthSelectList(),
-                    AvailableYears = GetYearSelectList(),
-                    AvailableUsers = new List<SelectListItem>(),
-                    CanViewAllUsers = false
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error generating dashboard data for user {UserId}", userId);
-                throw; 
-            }
+                Year = selectedYear,
+                Month = selectedMonth,
+                SelectedUserId = userId,
+                Stats = stats,
+                ProjectBreakdown = projectBreakdown.ToList(),
+                UserBreakdown = [],
+                AvailableMonths = GetMonthSelectList(),
+                AvailableYears = GetYearSelectList(),
+                AvailableUsers = [],
+                CanViewAllUsers = false
+            };
         }
 
         private List<SelectListItem> GetMonthSelectList()

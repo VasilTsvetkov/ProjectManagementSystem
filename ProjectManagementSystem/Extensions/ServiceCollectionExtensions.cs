@@ -51,23 +51,17 @@
             return services;
         }
 
-        public static void ConfigureSerilog()
+        public static void ConfigureSerilog(this ConfigureHostBuilder host)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Information()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                .MinimumLevel.Override("System", LogEventLevel.Warning)
-                .Enrich.FromLogContext()
-                .Enrich.WithMachineName()
-                .Enrich.WithThreadId()
-                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.File(
-                    path: "logs/app-.txt",
-                    rollingInterval: RollingInterval.Day,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                .CreateLogger();
+            host.UseSerilog((context, loggerConfiguration) =>
+            {
+                loggerConfiguration
+                    .Enrich.FromLogContext()
+                    .Enrich.WithMachineName()
+                    .Enrich.WithThreadId();
+
+                loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+            });
         }
 
         public static async Task SeedRolesAndAdminAsync(this IServiceProvider serviceProvider)

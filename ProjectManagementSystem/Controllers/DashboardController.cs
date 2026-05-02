@@ -8,6 +8,7 @@
     using ViewModels.Dashboard;
 
     [Authorize]
+    [Route("dashboard")]
     public class DashboardController : Controller
     {
         private readonly IDashboardService _dashboardService;
