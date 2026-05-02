@@ -5,14 +5,9 @@
     using Microsoft.EntityFrameworkCore;
     using Models;
 
-    public class CommentRepository : Repository<Comment>, ICommentRepository
+    public class CommentRepository(ApplicationDbContext context) : Repository<Comment>(context), ICommentRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public CommentRepository(ApplicationDbContext context) : base(context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public override async Task<Comment?> GetByIdAsync(int id)
             => await _context.Comments

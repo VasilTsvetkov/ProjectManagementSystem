@@ -6,11 +6,11 @@
     {
         public ApplicationUser()
         {
-            AssignedTasks = new List<ProjectTask>();
-            ReportedTasks = new List<ProjectTask>();
-            CreatedProjects = new List<Project>();
-            TimeLogs = new List<TimeLog>();
-            Comments = new List<Comment>();
+            AssignedTasks = [];
+            ReportedTasks = [];
+            CreatedProjects = [];
+            TimeLogs = [];
+            Comments = [];
         }
 
         public string? FirstName { get; set; }

@@ -7,16 +7,10 @@
     using Models;
     using ViewModels.Admin;
 
-    public class AdminService : IAdminService
+    public class AdminService(UserManager<ApplicationUser> userManager, ILogger<AdminService> logger) : IAdminService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<AdminService> _logger;
-
-        public AdminService(UserManager<ApplicationUser> userManager, ILogger<AdminService> logger)
-        {
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ILogger<AdminService> _logger = logger;
 
         public async Task<IEnumerable<UserRoleViewModel>> GetAllUsersWithRolesAsync()
         {

@@ -4,7 +4,7 @@
     {
         public Project()
         {
-            Tasks = new List<ProjectTask>();
+            Tasks = [];
         }
 
         public int Id { get; set; }

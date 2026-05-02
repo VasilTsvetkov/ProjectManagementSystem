@@ -7,24 +7,16 @@
     using Enums;
     using Helpers;
 
-    public class TimeLogService : ITimeLogService
+    public class TimeLogService(
+        ITimeLogRepository timeLogRepository,
+        ITaskRepository taskRepository,
+        IActivityService activityService,
+        ILogger<TimeLogService> logger) : ITimeLogService
     {
-        private readonly ITimeLogRepository _timeLogRepository;
-        private readonly ITaskRepository _taskRepository;
-        private readonly IActivityService _activityService;
-        private readonly ILogger<TimeLogService> _logger;
-
-        public TimeLogService(
-            ITimeLogRepository timeLogRepository,
-            ITaskRepository taskRepository,
-            IActivityService activityService,
-            ILogger<TimeLogService> logger)
-        {
-            _timeLogRepository = timeLogRepository;
-            _taskRepository = taskRepository;
-            _activityService = activityService;
-            _logger = logger;
-        }
+        private readonly ITimeLogRepository _timeLogRepository = timeLogRepository;
+        private readonly ITaskRepository _taskRepository = taskRepository;
+        private readonly IActivityService _activityService = activityService;
+        private readonly ILogger<TimeLogService> _logger = logger;
 
         public async Task<bool> CreateTimeLogAsync(TimeLogViewModel model, string userId)
         {

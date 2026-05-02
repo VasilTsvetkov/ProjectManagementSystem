@@ -6,16 +6,9 @@ namespace ProjectManagementSystem.Controllers
     using System.Security.Claims;
 
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController(IHomeService homeService) : Controller
     {
-        private readonly IHomeService _homeService;
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(IHomeService homeService, ILogger<HomeController> logger)
-        {
-            _homeService = homeService;
-            _logger = logger;
-        }
+        private readonly IHomeService _homeService = homeService;
 
         public async Task<IActionResult> Index()
         {

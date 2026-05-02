@@ -2,19 +2,13 @@
 {
     using Data;
     using DTOs.Dashboard;
-    using Helpers;
     using Interfaces;
     using Microsoft.EntityFrameworkCore;
     using Models;
 
-    public class TimeLogRepository : Repository<TimeLog>, ITimeLogRepository
+    public class TimeLogRepository(ApplicationDbContext context) : Repository<TimeLog>(context), ITimeLogRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public TimeLogRepository(ApplicationDbContext context) : base(context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<IEnumerable<TimeLog>> GetTimeLogsByTaskAsync(int taskId)
             => await _context.TimeLogs
@@ -71,7 +65,7 @@
         {
             var logs = await GetByMonthAsync(year, month, userId);
 
-            return logs
+            return [.. logs
                 .GroupBy(tl => new
                 {
                     tl.Task.Project.Id,
@@ -87,8 +81,7 @@
                     TaskCount = g.Select(tl => tl.TaskId).Distinct().Count(),
                     LogCount = g.Count()
                 })
-                .OrderByDescending(p => p.TotalHours)
-                .ToList();
+                .OrderByDescending(p => p.TotalHours)];
         }
 
         public async Task<IEnumerable<UserTimeDto>> GetUserBreakdownAsync(int year, int month, int? projectId = null)
@@ -106,7 +99,7 @@
 
             var logs = await query.ToListAsync();
 
-            return logs
+            return [.. logs
                 .GroupBy(tl => tl.User)
                 .Select(g => new UserTimeDto
                 {
@@ -116,8 +109,7 @@
                     ProjectCount = g.Select(tl => tl.Task.ProjectId).Distinct().Count(),
                     TaskCount = g.Select(tl => tl.TaskId).Distinct().Count()
                 })
-                .OrderByDescending(u => u.TotalHours)
-                .ToList();
+                .OrderByDescending(u => u.TotalHours)];
         }
     }
 }

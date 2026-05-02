@@ -2,7 +2,6 @@
 {
     using DTOs;
     using Enums;
-    using Helpers;
     using Interfaces;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,33 +12,22 @@
     using ViewModels.Tasks;
     using ViewModels.TimeLogs;
 
-    public class TaskService : ITaskService
+    public class TaskService(
+        ITaskRepository taskRepository,
+        IProjectRepository projectRepository,
+        ICommentRepository commentRepository,
+        ITimeLogRepository timeLogRepository,
+        IActivityService activityService,
+        UserManager<ApplicationUser> userManager,
+        ILogger<TaskService> logger) : ITaskService
     {
-        private readonly ITaskRepository _taskRepository;
-        private readonly IProjectRepository _projectRepository;
-        private readonly ICommentRepository _commentRepository;
-        private readonly ITimeLogRepository _timeLogRepository;
-        private readonly IActivityService _activityService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<TaskService> _logger;
-
-        public TaskService(
-            ITaskRepository taskRepository,
-            IProjectRepository projectRepository,
-            ICommentRepository commentRepository,
-            ITimeLogRepository timeLogRepository,
-            IActivityService activityService,
-            UserManager<ApplicationUser> userManager,
-            ILogger<TaskService> logger)
-        {
-            _taskRepository = taskRepository;
-            _projectRepository = projectRepository;
-            _commentRepository = commentRepository;
-            _timeLogRepository = timeLogRepository;
-            _activityService = activityService;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly ITaskRepository _taskRepository = taskRepository;
+        private readonly IProjectRepository _projectRepository = projectRepository;
+        private readonly ICommentRepository _commentRepository = commentRepository;
+        private readonly ITimeLogRepository _timeLogRepository = timeLogRepository;
+        private readonly IActivityService _activityService = activityService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ILogger<TaskService> _logger = logger;
 
         public async Task<(IEnumerable<TaskListViewModel> Tasks, string ProjectName)?> GetTasksByProjectAsync(int projectId)
         {

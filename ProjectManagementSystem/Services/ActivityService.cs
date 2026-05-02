@@ -5,14 +5,9 @@
     using Enums;
     using Interfaces;
 
-    public class ActivityService : IActivityService
+    public class ActivityService(ApplicationDbContext context) : IActivityService
     {
-        private readonly ApplicationDbContext _context;
-
-        public ActivityService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task LogAsync(string userId, string message, ActivityType type)
         {

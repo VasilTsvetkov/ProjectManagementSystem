@@ -7,8 +7,8 @@
     {
         public ProjectTask()
         {
-            Comments = new List<Comment>();
-            TimeLogs = new List<TimeLog>();
+            Comments = [];
+            TimeLogs = [];
         }
 
         public int Id { get; set; }

@@ -9,16 +9,10 @@
 
     [Authorize]
     [Route("comments")]
-    public class CommentsController : Controller
+    public class CommentsController(ICommentService commentService, UserManager<ApplicationUser> userManager) : Controller
     {
-        private readonly ICommentService _commentService;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public CommentsController(ICommentService commentService, UserManager<ApplicationUser> userManager)
-        {
-            _commentService = commentService;
-            _userManager = userManager;
-        }
+        private readonly ICommentService _commentService = commentService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status302Found)]

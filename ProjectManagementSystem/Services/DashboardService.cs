@@ -6,16 +6,9 @@
     using System.Globalization;
     using ViewModels.Dashboard;
 
-    public class DashboardService : IDashboardService
+    public class DashboardService(ITimeLogRepository timeLogRepository) : IDashboardService
     {
-        private readonly ITimeLogRepository _timeLogRepository;
-        private readonly ILogger<DashboardService> _logger;
-
-        public DashboardService(ITimeLogRepository timeLogRepository, ILogger<DashboardService> logger)
-        {
-            _timeLogRepository = timeLogRepository;
-            _logger = logger;
-        }
+        private readonly ITimeLogRepository _timeLogRepository = timeLogRepository;
 
         public async Task<DashboardViewModel> GetDashboardDataAsync(int? year, int? month, string userId)
         {
@@ -40,7 +33,7 @@
             };
         }
 
-        private List<SelectListItem> GetMonthSelectList()
+        private static List<SelectListItem> GetMonthSelectList()
         {
             return Enumerable.Range(1, 12)
                 .Select(m => new SelectListItem
@@ -51,7 +44,7 @@
                 .ToList();
         }
 
-        private List<SelectListItem> GetYearSelectList()
+        private static List<SelectListItem> GetYearSelectList()
         {
             var currentYear = DateTime.Now.Year;
             return Enumerable.Range(currentYear - 2, 5)

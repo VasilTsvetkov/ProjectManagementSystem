@@ -9,16 +9,10 @@
 
     [Authorize]
     [Route("timelogs")]
-    public class TimeLogsController : Controller
+    public class TimeLogsController(ITimeLogService timeLogService, UserManager<ApplicationUser> userManager) : Controller
     {
-        private readonly ITimeLogService _timeLogService;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public TimeLogsController(ITimeLogService timeLogService, UserManager<ApplicationUser> userManager)
-        {
-            _timeLogService = timeLogService;
-            _userManager = userManager;
-        }
+        private readonly ITimeLogService _timeLogService = timeLogService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status302Found)]

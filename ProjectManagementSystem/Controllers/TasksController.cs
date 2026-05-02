@@ -12,16 +12,10 @@
 
     [Authorize]
     [Route("tasks")]
-    public class TasksController : Controller
+    public class TasksController(ITaskService taskService, UserManager<ApplicationUser> userManager) : Controller
     {
-        private readonly ITaskService _taskService;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public TasksController(ITaskService taskService, UserManager<ApplicationUser> userManager)
-        {
-            _taskService = taskService;
-            _userManager = userManager;
-        }
+        private readonly ITaskService _taskService = taskService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [HttpGet("{projectId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -43,6 +37,7 @@
         public async Task<IActionResult> Create(int projectId)
         {
             var model = await _taskService.GetTaskViewModelForCreateAsync();
+            ViewBag.ProjectId = projectId;
             return View(model);
         }
 
@@ -61,7 +56,6 @@
             }
 
             var currentUserId = _userManager.GetUserId(User);
-
             if (currentUserId == null) return Unauthorized();
 
             await _taskService.CreateTaskAsync(projectId, model, currentUserId);
@@ -77,6 +71,7 @@
             var model = await _taskService.GetTaskForEditAsync(id);
             if (model == null) return NotFound();
 
+            ViewBag.ProjectId = projectId;
             return View(model);
         }
 
@@ -116,6 +111,7 @@
             var model = await _taskService.GetTaskForDeleteAsync(id);
             if (model == null) return NotFound();
 
+            ViewBag.ProjectId = projectId;
             return View(model);
         }
 
@@ -140,7 +136,6 @@
         public async Task<IActionResult> Details(int projectId, int id)
         {
             var userId = _userManager.GetUserId(User);
-
             if (userId == null) return Unauthorized();
 
             var model = await _taskService.GetTaskDetailsAsync(projectId, id, userId);
@@ -158,7 +153,7 @@
             if (userId == null) return Unauthorized();
 
             var updated = await _taskService.UpdateTaskStatusAsync(id, status, userId);
-            if (!updated) return NotFound();
+            if (!updated || projectId == 0) return NotFound();
 
             return Ok();
         }

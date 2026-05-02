@@ -9,18 +9,12 @@
 
     [Authorize]
     [Route("dashboard")]
-    public class DashboardController : Controller
+    public class DashboardController(
+        IDashboardService dashboardService,
+        UserManager<ApplicationUser> userManager) : Controller
     {
-        private readonly IDashboardService _dashboardService;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public DashboardController(
-            IDashboardService dashboardService,
-            UserManager<ApplicationUser> userManager)
-        {
-            _dashboardService = dashboardService;
-            _userManager = userManager;
-        }
+        private readonly IDashboardService _dashboardService = dashboardService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [HttpGet]
         [ProducesResponseType(typeof(DashboardViewModel), StatusCodes.Status200OK)]

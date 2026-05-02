@@ -11,16 +11,10 @@
 
     [Authorize]
     [Route("projects")]
-    public class ProjectsController : Controller
+    public class ProjectsController(IProjectService projectService, UserManager<ApplicationUser> userManager) : Controller
     {
-        private readonly IProjectService _projectService;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public ProjectsController(IProjectService projectService, UserManager<ApplicationUser> userManager)
-        {
-            _projectService = projectService;
-            _userManager = userManager;
-        }
+        private readonly IProjectService _projectService = projectService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [HttpGet("")]
         [ProducesResponseType(StatusCodes.Status200OK)]

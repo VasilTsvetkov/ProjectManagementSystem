@@ -6,16 +6,10 @@
     using System.Net;
     using System.Threading.Tasks;
 
-    public class ExceptionHandlingMiddleware
+    public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
-        {
-            _next = next;
-            _logger = logger;
-        }
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger = logger;
 
         public async Task InvokeAsync(HttpContext context)
         {
@@ -32,8 +26,8 @@
 
         private static Task HandleExceptionAsync(HttpContext context)
         {
-            var isAjax = context.Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
-                         context.Request.Path.StartsWithSegments("/api");
+            var isAjax = string.Equals(context.Request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.OrdinalIgnoreCase) ||
+                 context.Request.Path.StartsWithSegments("/api");
 
             if (isAjax)
             {

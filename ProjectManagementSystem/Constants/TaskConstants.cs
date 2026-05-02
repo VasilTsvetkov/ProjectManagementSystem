@@ -7,7 +7,7 @@
         public const string FeaturePrefix = "FEAT";
 
         public static readonly string[] Colors =
-        {
+        [
             "#3B82F6",
             "#8B5CF6",
             "#EC4899",
@@ -18,7 +18,7 @@
             "#F97316",
             "#14B8A6",
             "#A855F7"
-        };
+        ];
 
         public static readonly Dictionary<string, string> Icons = new()
         {

@@ -7,14 +7,9 @@
     using Enums;
     using Microsoft.EntityFrameworkCore;
 
-    public class HomeService : IHomeService
+    public class HomeService(ApplicationDbContext context) : IHomeService
     {
-        private readonly ApplicationDbContext _context;
-
-        public HomeService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<IndexViewModel> GetHomeIndexDataAsync(string userId)
         {

@@ -6,21 +6,14 @@
     using Microsoft.Extensions.Logging;
     using Enums;
 
-    public class ProjectService : IProjectService
+    public class ProjectService(
+        IProjectRepository projectRepository,
+        IActivityService activityService,
+        ILogger<ProjectService> logger) : IProjectService
     {
-        private readonly IProjectRepository _projectRepository;
-        private readonly IActivityService _activityService;
-        private readonly ILogger<ProjectService> _logger;
-
-        public ProjectService(
-            IProjectRepository projectRepository,
-            IActivityService activityService,
-            ILogger<ProjectService> logger)
-        {
-            _projectRepository = projectRepository;
-            _activityService = activityService;
-            _logger = logger;
-        }
+        private readonly IProjectRepository _projectRepository = projectRepository;
+        private readonly IActivityService _activityService = activityService;
+        private readonly ILogger<ProjectService> _logger = logger;
 
         public async Task<IEnumerable<ProjectListViewModel>> GetAllProjectsAsync()
         {

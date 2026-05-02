@@ -6,24 +6,16 @@
     using Microsoft.Extensions.Logging;
     using Enums;
 
-    public class CommentService : ICommentService
+    public class CommentService(
+        ICommentRepository commentRepository,
+        ITaskRepository taskRepository,
+        IActivityService activityService,
+        ILogger<CommentService> logger) : ICommentService
     {
-        private readonly ICommentRepository _commentRepository;
-        private readonly ITaskRepository _taskRepository;
-        private readonly IActivityService _activityService;
-        private readonly ILogger<CommentService> _logger;
-
-        public CommentService(
-            ICommentRepository commentRepository,
-            ITaskRepository taskRepository,
-            IActivityService activityService,
-            ILogger<CommentService> logger)
-        {
-            _commentRepository = commentRepository;
-            _taskRepository = taskRepository;
-            _activityService = activityService;
-            _logger = logger;
-        }
+        private readonly ICommentRepository _commentRepository = commentRepository;
+        private readonly ITaskRepository _taskRepository = taskRepository;
+        private readonly IActivityService _activityService = activityService;
+        private readonly ILogger<CommentService> _logger = logger;
 
         public async Task<bool> CreateCommentAsync(CommentViewModel model, string userId)
         {

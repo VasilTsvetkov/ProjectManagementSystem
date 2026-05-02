@@ -7,14 +7,9 @@
 
     [Authorize(Roles = Roles.Admin)]
     [Route("admin")]
-    public class AdminController : Controller
+    public class AdminController(IAdminService adminService) : Controller
     {
-        private readonly IAdminService _adminService;
-
-        public AdminController(IAdminService adminService)
-        {
-            _adminService = adminService;
-        }
+        private readonly IAdminService _adminService = adminService;
 
         [HttpGet("users")]
         [ProducesResponseType(StatusCodes.Status200OK)]

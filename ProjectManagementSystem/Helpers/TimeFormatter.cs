@@ -14,7 +14,7 @@
             if (days > 0) parts.Add($"{days}d");
             if (h > 0) parts.Add($"{h}h");
             if (minutes > 0) parts.Add($"{minutes}m");
-            return parts.Any() ? string.Join(" ", parts) : "0m";
+            return parts.Count > 0 ? string.Join(" ", parts) : "0m";
         }
     }
 }

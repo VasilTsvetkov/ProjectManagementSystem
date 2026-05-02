@@ -6,14 +6,9 @@
     using Microsoft.EntityFrameworkCore;
     using Models;
 
-    public class ProjectRepository : Repository<Project>, IProjectRepository
+    public class ProjectRepository(ApplicationDbContext context) : Repository<Project>(context), IProjectRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public ProjectRepository(ApplicationDbContext context) : base(context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public override async Task<Project?> GetByIdAsync(int id)
             => await _context.Projects

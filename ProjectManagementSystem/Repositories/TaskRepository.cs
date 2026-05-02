@@ -7,14 +7,9 @@
     using Microsoft.EntityFrameworkCore;
     using Models;
 
-    public class TaskRepository : Repository<ProjectTask>, ITaskRepository
+    public class TaskRepository(ApplicationDbContext context) : Repository<ProjectTask>(context), ITaskRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public TaskRepository(ApplicationDbContext context) : base(context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<IEnumerable<ProjectTask>> GetTasksByProjectAsync(int projectId)
             => await _context.Tasks
