@@ -5,13 +5,15 @@ namespace ProjectManagementSystem
 
     public class Program
     {
+        private static readonly ILogger _logger = Log.Logger;
+
         public static async Task Main(string[] args)
         {
             ServiceCollectionExtensions.ConfigureSerilog();
 
             try
             {
-                Log.Information("Starting Application");
+                _logger.Information("Starting Application");
 
                 var builder = WebApplication.CreateBuilder(args);
                 builder.Host.UseSerilog();
@@ -19,6 +21,7 @@ namespace ProjectManagementSystem
                 builder.Services.AddDatabase(builder.Configuration);
                 builder.Services.AddIdentityServices();
                 builder.Services.AddRepositories();
+                builder.Services.AddApplicationServices();
                 builder.Services.AddControllersWithViews();
 
                 var app = builder.Build();
@@ -30,12 +33,12 @@ namespace ProjectManagementSystem
 
                 app.UseMiddlewarePipeline();
 
-                Log.Information("Application started successfully");
+                _logger.Information("Application started successfully");
                 app.Run();
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Application failed to start");
+                _logger.Fatal(ex, "Application failed to start");
                 throw;
             }
             finally

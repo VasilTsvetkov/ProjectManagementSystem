@@ -11,12 +11,12 @@
     [Route("timelogs")]
     public class TimeLogsController : Controller
     {
-        private readonly ITimeLogRepository _timeLogRepository;
+        private readonly ITimeLogService _timeLogService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public TimeLogsController(ITimeLogRepository timeLogRepository, UserManager<ApplicationUser> userManager)
+        public TimeLogsController(ITimeLogService timeLogService, UserManager<ApplicationUser> userManager)
         {
-            _timeLogRepository = timeLogRepository;
+            _timeLogService = timeLogService;
             _userManager = userManager;
         }
 
@@ -28,37 +28,36 @@
             if (!ModelState.IsValid)
                 return RedirectToAction("Details", "Tasks", new { projectId = model.ProjectId, id = model.TaskId });
 
-            var totalHours = model.Days * 8 + model.Hours + model.Minutes / 60.0;
+            var userId = _userManager.GetUserId(User);
 
-            var timeLog = new TimeLog
+            if (userId == null)
             {
-                Hours = totalHours,
-                Date = model.Date,
-                Description = model.Description,
-                TaskId = model.TaskId,
-                UserId = _userManager.GetUserId(User)
-            };
+                return Unauthorized();
+            }
 
-            await _timeLogRepository.AddAsync(timeLog);
+            await _timeLogService.CreateTimeLogAsync(model, userId);
+
             return RedirectToAction("Details", "Tasks", new { projectId = model.ProjectId, id = model.TaskId });
         }
 
         [HttpPost("{id}/delete")]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete(int id, int projectId)
         {
-            var timeLog = await _timeLogRepository.GetByIdAsync(id);
-            if (timeLog == null) return NotFound();
-
             var userId = _userManager.GetUserId(User);
-            if (timeLog.UserId != userId) return Forbid();
 
-            var taskId = timeLog.TaskId;
-            var deleted = await _timeLogRepository.DeleteAsync(id);
-            if (!deleted) return NotFound();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
 
-            return RedirectToAction("Details", "Tasks", new { projectId, id = taskId });
+            var result = await _timeLogService.DeleteTimeLogAsync(id, userId);
+
+            if (result == null) return NotFound();
+
+            return RedirectToAction("Details", "Tasks", new { projectId, id = result.Value.TaskId });
         }
     }
 }

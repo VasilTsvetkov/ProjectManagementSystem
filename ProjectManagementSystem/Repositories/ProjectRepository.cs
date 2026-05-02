@@ -1,10 +1,10 @@
 ﻿namespace ProjectManagementSystem.Repositories
 {
+    using Constants;
     using Data;
     using Interfaces;
     using Microsoft.EntityFrameworkCore;
     using Models;
-    using ProjectManagementSystem.Constants;
 
     public class ProjectRepository : Repository<Project>, IProjectRepository
     {
@@ -15,10 +15,26 @@
             _context = context;
         }
 
-        public async Task AddAsync(Project entity)
+        public override async Task<Project?> GetByIdAsync(int id)
+            => await _context.Projects
+                .Include(p => p.Creator)
+                .Include(p => p.Tasks)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+        public override async Task<IEnumerable<Project>> GetAllAsync()
+            => await _context.Projects
+                .Include(p => p.Creator)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+        public override async Task AddAsync(Project entity)
         {
-            var count = await _context.Projects.CountAsync();
-            entity.Tag = $"{ProjectConstants.TagPrefix}-{count + 1}";
+            var maxNumber = await _context.Projects
+                .MaxAsync(p => (int?)p.Number) ?? 0;
+
+            entity.Number = maxNumber + 1;
+            entity.Tag = $"{ProjectConstants.TagPrefix}-{entity.Number}";
+
             await _context.Projects.AddAsync(entity);
             await _context.SaveChangesAsync();
         }

@@ -8,6 +8,7 @@
     using Repositories;
     using Serilog;
     using Serilog.Events;
+    using Services;
 
     public static class ServiceCollectionExtensions
     {
@@ -27,6 +28,18 @@
             return services;
         }
 
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        {
+            services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<ITaskService, TaskService>();
+            services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<ITimeLogService, TimeLogService>();
+            services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<ICommentService, CommentService>();
+
+            return services;
+        }
+
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -34,6 +47,7 @@
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<ITimeLogRepository, TimeLogRepository>();
+
             return services;
         }
 
@@ -60,6 +74,7 @@
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            
             await RoleSeeder.SeedRolesAsync(roleManager, userManager);
         }
     }

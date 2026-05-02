@@ -4,7 +4,7 @@
 
     public interface IProjectRepository : IRepository<Project>
     {
-        Task AddAsync(Project entity);
+        new Task AddAsync(Project entity);
         Task<bool> UpdateProjectAsync(int id, string name, string description);
     }
 }

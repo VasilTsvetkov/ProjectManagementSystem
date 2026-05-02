@@ -23,6 +23,8 @@
     <dd class="col-sm-10">@Model.Status.GetDisplayName()</dd>
     <dt class="col-sm-2">Deadline</dt>
     <dd class="col-sm-10">@(Model.Deadline?.ToString("dd MMM yyyy") ?? "-")</dd>
+    <dt class="col-sm-2">Reporter</dt>
+    <dd class="col-sm-10">@Model.ReporterName</dd>
     <dt class="col-sm-2">Assignee</dt>
     <dd class="col-sm-10">@(Model.AssigneeName ?? "Unassigned")</dd>
 </dl>
@@ -75,7 +77,7 @@ else
                     <strong>@log.FormattedHours</strong> - @log.Date.ToString("dd MMM yyyy")
                     @if (!string.IsNullOrEmpty(log.Description))
                     {
-                        <span class="text-muted"> — @log.Description</span>
+                        <span class="text-muted"> - @log.Description</span>
                     }
                     <br />
                     <small class="text-muted">@log.UserName</small>

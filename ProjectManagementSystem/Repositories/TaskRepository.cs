@@ -1,6 +1,5 @@
 ﻿namespace ProjectManagementSystem.Repositories
 {
-    using Constants;
     using Data;
     using DTOs;
     using Enums;
@@ -20,12 +19,14 @@
         public async Task<IEnumerable<ProjectTask>> GetTasksByProjectAsync(int projectId)
             => await _context.Tasks
                 .Include(t => t.Assignee)
+                .Include(t => t.Reporter)
                 .Where(t => t.ProjectId == projectId)
                 .ToListAsync();
 
         public async Task<IEnumerable<ProjectTask>> GetTasksByAssigneeAsync(string userId)
             => await _context.Tasks
                 .Include(t => t.Project)
+                .Include(t => t.Reporter)
                 .Where(t => t.AssigneeId == userId)
                 .ToListAsync();
 
@@ -41,27 +42,20 @@
             existing.Priority = dto.Priority;
             existing.Status = dto.Status;
             existing.Deadline = dto.Deadline;
-            existing.AssigneeId = dto.AssigneeId;
+            existing.AssigneeId = string.IsNullOrWhiteSpace(dto.AssigneeId) ? null : dto.AssigneeId;
 
             await _context.SaveChangesAsync();
-
             return true;
         }
 
-        public async Task AddAsync(ProjectTask entity)
+        public override async Task AddAsync(ProjectTask entity)
         {
-            var prefix = entity.Type switch
-            {
-                TaskType.Bug => TaskConstants.BugPrefix,
-                TaskType.Feature => TaskConstants.FeaturePrefix,
-                TaskType.Task => TaskConstants.TaskPrefix,
-                _ => TaskConstants.TaskPrefix
-            };
+            var maxNumber = await _context.Tasks
+                .Where(t => t.Type == entity.Type)
+                .MaxAsync(t => (int?)t.TaskNumber) ?? 0;
 
-            var count = await _context.Tasks
-                .CountAsync(t => t.Type == entity.Type);
+            entity.TaskNumber = maxNumber + 1;
 
-            entity.TaskNumber = count + 1;
             await _context.Tasks.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
@@ -76,10 +70,15 @@
             return true;
         }
 
-        public async Task<ProjectTask?> GetTaskByIdAsync(int id)
+        public override async Task<ProjectTask?> GetByIdAsync(int id)
             => await _context.Tasks
                 .Include(t => t.Assignee)
+                .Include(t => t.Reporter)
                 .Include(t => t.Project)
+                .Include(t => t.Comments)
+                    .ThenInclude(c => c.User)
+                .Include(t => t.TimeLogs)
+                    .ThenInclude(tl => tl.User)
                 .FirstOrDefaultAsync(t => t.Id == id);
     }
 }

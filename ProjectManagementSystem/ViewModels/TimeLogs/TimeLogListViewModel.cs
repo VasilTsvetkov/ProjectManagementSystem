@@ -8,7 +8,7 @@ namespace ProjectManagementSystem.ViewModels.TimeLogs
         public double Hours { get; set; }
         public DateTime Date { get; set; }
         public string? Description { get; set; }
-        public string UserName { get; set; }
+        public string UserName { get; set; } = string.Empty;
         public bool CanEdit { get; set; }
         public string FormattedHours => TimeFormatter.Format(Hours);
     }

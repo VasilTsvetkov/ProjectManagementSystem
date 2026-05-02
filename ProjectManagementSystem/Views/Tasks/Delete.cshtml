@@ -24,7 +24,7 @@
     <dt class="col-sm-2">Deadline</dt>
     <dd class="col-sm-10">@(Model.Deadline?.ToString("dd MMM yyyy") ?? "-")</dd>
     <dt class="col-sm-2">Assignee</dt>
-    <dd class="col-sm-10">@Model.AssigneeEmail</dd>
+    <dd class="col-sm-10">@Model.AssigneeName</dd>
 </dl>
 
 <form asp-action="Delete" asp-route-projectId="@Context.GetRouteValue("projectId")" asp-route-id="@Model.Id" method="post">

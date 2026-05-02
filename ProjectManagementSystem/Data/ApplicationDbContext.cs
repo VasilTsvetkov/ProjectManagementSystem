@@ -1,11 +1,10 @@
 ﻿namespace ProjectManagementSystem.Data
 {
-	using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-	using Microsoft.EntityFrameworkCore;
-	using Models;
-    using System.Reflection.Emit;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore;
+    using Models;
 
-	public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
@@ -47,9 +46,21 @@
 
 			builder.Entity<ProjectTask>()
 				.HasOne(t => t.Assignee)
-				.WithMany(u => u.Tasks)
+				.WithMany(u => u.AssignedTasks)
 				.HasForeignKey(t => t.AssigneeId)
 				.OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<ProjectTask>()
+				.HasOne(t => t.Reporter)
+				.WithMany(u => u.ReportedTasks)
+				.HasForeignKey(t => t.ReporterId)
+				.OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Project>()
+                .HasOne(p => p.Creator)
+                .WithMany(u => u.CreatedProjects)
+                .HasForeignKey(p => p.CreatorId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<ProjectTask>()
                .HasMany(t => t.Comments)

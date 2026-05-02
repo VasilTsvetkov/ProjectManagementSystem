@@ -12,12 +12,12 @@
     [Route("projects")]
     public class ProjectsController : Controller
     {
-        private readonly IProjectRepository _projectRepository;
+        private readonly IProjectService _projectService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ProjectsController(IProjectRepository projectRepository, UserManager<ApplicationUser> userManager)
+        public ProjectsController(IProjectService projectService, UserManager<ApplicationUser> userManager)
         {
-            _projectRepository = projectRepository;
+            _projectService = projectService;
             _userManager = userManager;
         }
 
@@ -25,18 +25,8 @@
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Index()
         {
-            var projects = await _projectRepository.GetAllAsync();
-
-            var model = projects.Select(p => new ProjectListViewModel
-            {
-                Id = p.Id,
-                Tag = p.Tag,
-                Name = p.Name,
-                Description = p.Description,
-                CreatedAt = p.CreatedAt
-            });
-
-            return View(model);
+            var projects = await _projectService.GetAllProjectsAsync();
+            return View(projects);
         }
 
         [HttpGet("create")]
@@ -55,15 +45,14 @@
             if (!ModelState.IsValid)
                 return View(model);
 
-            var project = new Project
-            {
-                Name = model.Name,
-                Description = model.Description,
-                CreatedByUserId = _userManager.GetUserId(User),
-                CreatedAt = DateTime.UtcNow
-            };
+            var userId = _userManager.GetUserId(User);
 
-            await _projectRepository.AddAsync(project);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            await _projectService.CreateProjectAsync(model, userId);
 
             return RedirectToAction(nameof(Index));
         }
@@ -74,14 +63,8 @@
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Edit(int id)
         {
-            var project = await _projectRepository.GetByIdAsync(id);
-            if (project == null) return NotFound();
-
-            var model = new ProjectViewModel
-            {
-                Name = project.Name,
-                Description = project.Description
-            };
+            var model = await _projectService.GetProjectForEditAsync(id);
+            if (model == null) return NotFound();
 
             return View(model);
         }
@@ -97,8 +80,7 @@
             if (!ModelState.IsValid)
                 return View(model);
 
-            var updated = await _projectRepository.UpdateProjectAsync(id, model.Name, model.Description);
-
+            var updated = await _projectService.UpdateProjectAsync(id, model);
             if (!updated) return NotFound();
 
             return RedirectToAction(nameof(Index));
@@ -110,16 +92,8 @@
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
-            var project = await _projectRepository.GetByIdAsync(id);
-            if (project == null) return NotFound();
-
-            var model = new ProjectDetailsViewModel
-            {
-                Id = project.Id,
-                Name = project.Name,
-                Description = project.Description,
-                CreatedAt = project.CreatedAt
-            };
+            var model = await _projectService.GetProjectForDeleteAsync(id);
+            if (model == null) return NotFound();
 
             return View(model);
         }
@@ -130,7 +104,7 @@
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var deleted = await _projectRepository.DeleteAsync(id);
+            var deleted = await _projectService.DeleteProjectAsync(id);
             if (!deleted) return NotFound();
 
             return RedirectToAction(nameof(Index));

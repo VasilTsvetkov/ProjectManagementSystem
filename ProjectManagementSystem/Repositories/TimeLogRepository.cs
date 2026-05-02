@@ -1,10 +1,11 @@
 ﻿namespace ProjectManagementSystem.Repositories
 {
     using Data;
+    using DTOs.Dashboard;
+    using Helpers;
     using Interfaces;
     using Microsoft.EntityFrameworkCore;
     using Models;
-    using DTOs.Dashboard;
 
     public class TimeLogRepository : Repository<TimeLog>, ITimeLogRepository
     {
@@ -106,11 +107,11 @@
             var logs = await query.ToListAsync();
 
             return logs
-                .GroupBy(tl => new { tl.UserId, tl.User.FirstName, tl.User.LastName })
+                .GroupBy(tl => tl.User)
                 .Select(g => new UserTimeDto
                 {
-                    UserId = g.Key.UserId,
-                    UserName = $"{g.Key.FirstName} {g.Key.LastName}",
+                    UserId = g.Key.Id,
+                    UserName = UserDisplayNameHelper.GetFullName(g.Key),
                     TotalHours = g.Sum(tl => tl.Hours),
                     ProjectCount = g.Select(tl => tl.Task.ProjectId).Distinct().Count(),
                     TaskCount = g.Select(tl => tl.TaskId).Distinct().Count()

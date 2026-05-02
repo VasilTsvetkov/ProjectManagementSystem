@@ -1,79 +1,38 @@
 ﻿namespace ProjectManagementSystem.Controllers
 {
-    using DTOs.Dashboard;
     using Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Rendering;
     using Models;
-    using System.Globalization;
     using ViewModels.Dashboard;
 
     [Authorize]
     public class DashboardController : Controller
     {
-        private readonly ITimeLogRepository _timeLogRepository;
+        private readonly IDashboardService _dashboardService;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public DashboardController(
-            ITimeLogRepository timeLogRepository,
+            IDashboardService dashboardService,
             UserManager<ApplicationUser> userManager)
         {
-            _timeLogRepository = timeLogRepository;
+            _dashboardService = dashboardService;
             _userManager = userManager;
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DashboardViewModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Index(int? year, int? month)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
 
-            var selectedYear = year ?? DateTime.Now.Year;
-            var selectedMonth = month ?? DateTime.Now.Month;
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-            var stats = await _timeLogRepository.GetMonthlyStatsAsync(selectedYear, selectedMonth, currentUser.Id);
-            var projectBreakdown = await _timeLogRepository.GetProjectBreakdownAsync(selectedYear, selectedMonth, currentUser.Id);
-
-            var viewModel = new DashboardViewModel
-            {
-                Year = selectedYear,
-                Month = selectedMonth,
-                SelectedUserId = currentUser.Id,
-                Stats = stats,
-                ProjectBreakdown = projectBreakdown.ToList(),
-                UserBreakdown = new List<UserTimeDto>(),
-                AvailableMonths = GetMonthSelectList(),
-                AvailableYears = GetYearSelectList(),
-                AvailableUsers = new List<SelectListItem>(),
-                CanViewAllUsers = false
-            };
+            var viewModel = await _dashboardService.GetDashboardDataAsync(year, month, userId);
 
             return View(viewModel);
-        }
-
-        private List<SelectListItem> GetMonthSelectList()
-        {
-            return Enumerable.Range(1, 12)
-                .Select(m => new SelectListItem
-                {
-                    Value = m.ToString(),
-                    Text = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
-                })
-                .ToList();
-        }
-
-        private List<SelectListItem> GetYearSelectList()
-        {
-            var currentYear = DateTime.Now.Year;
-            return Enumerable.Range(currentYear - 2, 5)
-                .Select(y => new SelectListItem
-                {
-                    Value = y.ToString(),
-                    Text = y.ToString()
-                })
-                .ToList();
         }
     }
 }

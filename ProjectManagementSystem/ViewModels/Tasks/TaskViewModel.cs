@@ -2,15 +2,16 @@
 {
     using Enums;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
     public class TaskViewModel
     {
         [Required]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Required]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [Required]
         public TaskType Type { get; set; }
@@ -22,6 +23,6 @@
 
         public string? AssigneeId { get; set; }
 
-        public IEnumerable<SelectListItem>? Users { get; set; }
+        public IEnumerable<SelectListItem> Users { get; set; } = [];
     }
 }

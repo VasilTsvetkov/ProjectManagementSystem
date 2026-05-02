@@ -14,9 +14,10 @@
             _context = context;
         }
 
-        public async Task<Comment?> GetByIdAsync(int id)
+        public override async Task<Comment?> GetByIdAsync(int id)
             => await _context.Comments
                 .Include(c => c.Task)
+                .Include(c => c.User)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
         public async Task<IEnumerable<Comment>> GetCommentsByTaskAsync(int taskId)
