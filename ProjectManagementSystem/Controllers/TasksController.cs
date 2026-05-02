@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Models;
+    using System.Security.Claims;
     using ViewModels.Tasks;
 
     [Authorize]
@@ -61,7 +62,7 @@
 
             var currentUserId = _userManager.GetUserId(User);
 
-            if (currentUserId == null) return NotFound();
+            if (currentUserId == null) return Unauthorized();
 
             await _taskService.CreateTaskAsync(projectId, model, currentUserId);
             return RedirectToAction(nameof(Index), new { projectId });
@@ -84,6 +85,7 @@
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Edit(int projectId, int id, EditTaskViewModel model)
         {
             if (!ModelState.IsValid)
@@ -96,7 +98,10 @@
                 return View(model);
             }
 
-            var updated = await _taskService.UpdateTaskAsync(id, model);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var updated = await _taskService.UpdateTaskAsync(id, model, userId);
             if (!updated) return NotFound();
 
             return RedirectToAction(nameof(Index), new { projectId });
@@ -120,7 +125,10 @@
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteConfirmed(int projectId, int id)
         {
-            var deleted = await _taskService.DeleteTaskAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var deleted = await _taskService.DeleteTaskAsync(id, userId);
             if (!deleted) return NotFound();
 
             return RedirectToAction(nameof(Index), new { projectId });
@@ -133,10 +141,7 @@
         {
             var userId = _userManager.GetUserId(User);
 
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             var model = await _taskService.GetTaskDetailsAsync(projectId, id, userId);
             if (model == null) return NotFound();
@@ -149,7 +154,10 @@
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateStatus(int projectId, int id, [FromBody] ProjectTaskStatus status)
         {
-            var updated = await _taskService.UpdateTaskStatusAsync(id, status);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var updated = await _taskService.UpdateTaskStatusAsync(id, status, userId);
             if (!updated) return NotFound();
 
             return Ok();

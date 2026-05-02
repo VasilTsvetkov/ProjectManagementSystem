@@ -32,7 +32,7 @@
                 {
                     UserId = user.Id,
                     Email = user.Email ?? "No Email Provided",
-                    FullName = UserDisplayNameHelper.GetFullName(user),
+                    FullName = user.FullName,
                     CurrentRole = currentRole,
                     IsAdmin = currentRole == UserRole.Admin.ToRoleName()
                 });

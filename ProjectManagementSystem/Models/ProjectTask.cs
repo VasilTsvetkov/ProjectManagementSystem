@@ -25,7 +25,7 @@
         public string? AssigneeId { get; set; }
         public ApplicationUser? Assignee { get; set; }
         public string ReporterId { get; set; } = string.Empty;
-        public ApplicationUser? Reporter { get; set; }
+        public ApplicationUser Reporter { get; set; } = null!;
         public ICollection<Comment> Comments { get; set; }
         public ICollection<TimeLog> TimeLogs { get; set; }
         public string Tag => $"{GetPrefix()}-{TaskNumber}";

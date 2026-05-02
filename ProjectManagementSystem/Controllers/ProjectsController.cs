@@ -6,6 +6,7 @@
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Models;
+    using System.Security.Claims;
     using ViewModels.Projects;
 
     [Authorize]
@@ -80,7 +81,11 @@
             if (!ModelState.IsValid)
                 return View(model);
 
-            var updated = await _projectService.UpdateProjectAsync(id, model);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null) return Unauthorized();
+
+            var updated = await _projectService.UpdateProjectAsync(id, model, userId);
             if (!updated) return NotFound();
 
             return RedirectToAction(nameof(Index));
@@ -104,7 +109,11 @@
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var deleted = await _projectService.DeleteProjectAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null) return Unauthorized();
+
+            var deleted = await _projectService.DeleteProjectAsync(id, userId);
             if (!deleted) return NotFound();
 
             return RedirectToAction(nameof(Index));

@@ -1,6 +1,5 @@
 ﻿namespace ProjectManagementSystem.Services
 {
-    using DTOs.Dashboard;
     using Interfaces;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.Extensions.Logging;

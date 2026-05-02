@@ -1,32 +1,39 @@
-using Microsoft.AspNetCore.Mvc;
-using ProjectManagementSystem.Models;
-using System.Diagnostics;
-
 namespace ProjectManagementSystem.Controllers
 {
-	public class HomeController : Controller
-	{
-		private readonly ILogger<HomeController> _logger;
+    using Interfaces;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using System.Security.Claims;
 
-		public HomeController(ILogger<HomeController> logger)
-		{
-			_logger = logger;
-		}
+    [Authorize]
+    public class HomeController : Controller
+    {
+        private readonly IHomeService _homeService;
+        private readonly ILogger<HomeController> _logger;
 
-		public IActionResult Index()
-		{
-			return View();
-		}
+        public HomeController(IHomeService homeService, ILogger<HomeController> logger)
+        {
+            _homeService = homeService;
+            _logger = logger;
+        }
 
-		public IActionResult Privacy()
-		{
-			return View();
-		}
+        public async Task<IActionResult> Index()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var model = await _homeService.GetHomeIndexDataAsync(userId);
 
-		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-		public IActionResult Error()
-		{
-			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-		}
-	}
+            return View(model);
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new Models.ErrorViewModel { RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+    }
 }

@@ -4,15 +4,24 @@
     using Models;
     using ViewModels.Comments;
     using Microsoft.Extensions.Logging;
+    using Enums;
 
     public class CommentService : ICommentService
     {
         private readonly ICommentRepository _commentRepository;
+        private readonly ITaskRepository _taskRepository;
+        private readonly IActivityService _activityService;
         private readonly ILogger<CommentService> _logger;
 
-        public CommentService(ICommentRepository commentRepository, ILogger<CommentService> logger)
+        public CommentService(
+            ICommentRepository commentRepository,
+            ITaskRepository taskRepository,
+            IActivityService activityService,
+            ILogger<CommentService> logger)
         {
             _commentRepository = commentRepository;
+            _taskRepository = taskRepository;
+            _activityService = activityService;
             _logger = logger;
         }
 
@@ -27,6 +36,11 @@
             };
 
             await _commentRepository.AddAsync(comment);
+
+            var task = await _taskRepository.GetByIdAsync(model.TaskId);
+            string taskTag = task?.Tag ?? "a task";
+
+            await _activityService.LogAsync(userId, $"Added a comment to {taskTag}", ActivityType.CommentAction);
 
             _logger.LogInformation("User {UserId} added a comment to Task {TaskId}", userId, model.TaskId);
 
@@ -63,6 +77,10 @@
 
             if (result)
             {
+                var task = await _taskRepository.GetByIdAsync(comment.TaskId);
+                string taskTag = task?.Tag ?? "a task";
+
+                await _activityService.LogAsync(userId, $"Updated a comment on {taskTag}", ActivityType.CommentAction);
                 _logger.LogInformation("Comment {CommentId} updated by user {UserId}", id, userId);
             }
 
@@ -79,10 +97,14 @@
             }
 
             var taskId = comment.TaskId;
+            var task = await _taskRepository.GetByIdAsync(taskId);
+            string taskTag = task?.Tag ?? "a task";
+
             var deleted = await _commentRepository.DeleteAsync(id);
 
             if (deleted)
             {
+                await _activityService.LogAsync(userId, $"Deleted a comment from {taskTag}", ActivityType.CommentAction);
                 _logger.LogInformation("Comment {CommentId} deleted from Task {TaskId} by user {UserId}", id, taskId, userId);
             }
 

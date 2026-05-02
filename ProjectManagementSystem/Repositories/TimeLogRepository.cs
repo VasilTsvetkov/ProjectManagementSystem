@@ -111,7 +111,7 @@
                 .Select(g => new UserTimeDto
                 {
                     UserId = g.Key.Id,
-                    UserName = UserDisplayNameHelper.GetFullName(g.Key),
+                    UserName = g.Key.FullName,
                     TotalHours = g.Sum(tl => tl.Hours),
                     ProjectCount = g.Select(tl => tl.Task.ProjectId).Distinct().Count(),
                     TaskCount = g.Select(tl => tl.TaskId).Distinct().Count()

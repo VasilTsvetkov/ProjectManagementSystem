@@ -5,56 +5,57 @@
     using Models;
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-	{
-		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-			: base(options)
-		{
-		}
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
 
-		public DbSet<Project> Projects { get; set; }
-		public DbSet<ProjectTask> Tasks { get; set; }
-		public DbSet<Comment> Comments { get; set; }
-		public DbSet<TimeLog> TimeLogs { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectTask> Tasks { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<TimeLog> TimeLogs { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
 
-		protected override void OnModelCreating(ModelBuilder builder)
-		{
-			base.OnModelCreating(builder);
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
 
-			builder.Entity<Comment>()
-				.HasOne(c => c.Task)
-				.WithMany(t => t.Comments)
-				.HasForeignKey(c => c.TaskId)
-				.OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Comment>()
+                .HasOne(c => c.Task)
+                .WithMany(t => t.Comments)
+                .HasForeignKey(c => c.TaskId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-			builder.Entity<Comment>()
-				.HasOne(c => c.User)
-				.WithMany(u => u.Comments)
-				.HasForeignKey(c => c.UserId)
-				.OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Comments)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-			builder.Entity<TimeLog>()
-				.HasOne(t => t.Task)
-				.WithMany(t => t.TimeLogs)
-				.HasForeignKey(t => t.TaskId)
-				.OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<TimeLog>()
+                .HasOne(t => t.Task)
+                .WithMany(t => t.TimeLogs)
+                .HasForeignKey(t => t.TaskId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-			builder.Entity<TimeLog>()
-				.HasOne(t => t.User)
-				.WithMany(u => u.TimeLogs)
-				.HasForeignKey(t => t.UserId)
-				.OnDelete(DeleteBehavior.NoAction);
-
-			builder.Entity<ProjectTask>()
-				.HasOne(t => t.Assignee)
-				.WithMany(u => u.AssignedTasks)
-				.HasForeignKey(t => t.AssigneeId)
-				.OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<TimeLog>()
+                .HasOne(t => t.User)
+                .WithMany(u => u.TimeLogs)
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<ProjectTask>()
-				.HasOne(t => t.Reporter)
-				.WithMany(u => u.ReportedTasks)
-				.HasForeignKey(t => t.ReporterId)
-				.OnDelete(DeleteBehavior.NoAction);
+                .HasOne(t => t.Assignee)
+                .WithMany(u => u.AssignedTasks)
+                .HasForeignKey(t => t.AssigneeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<ProjectTask>()
+                .HasOne(t => t.Reporter)
+                .WithMany(u => u.ReportedTasks)
+                .HasForeignKey(t => t.ReporterId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Project>()
                 .HasOne(p => p.Creator)
@@ -76,6 +77,15 @@
                 .HasMany(p => p.Tasks)
                 .WithOne(t => t.Project)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ActivityLog>()
+                .HasOne(a => a.User)
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<ActivityLog>()
+                .HasIndex(a => new { a.UserId, a.Timestamp });
         }
-	}
+    }
 }

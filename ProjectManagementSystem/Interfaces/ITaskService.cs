@@ -12,8 +12,8 @@
         Task<TaskDetailsViewModel?> GetTaskDetailsAsync(int projectId, int id, string currentUserId);
         Task<(IEnumerable<TaskListViewModel> Tasks, string ProjectName, string ProjectTag)?> GetTasksForBoardAsync(int projectId);
         Task<bool> CreateTaskAsync(int projectId, TaskViewModel model, string currentUserId);
-        Task<bool> UpdateTaskAsync(int id, EditTaskViewModel model);
-        Task<bool> DeleteTaskAsync(int id);
-        Task<bool> UpdateTaskStatusAsync(int id, ProjectTaskStatus status);
+        Task<bool> UpdateTaskAsync(int id, EditTaskViewModel model, string userId);
+        Task<bool> DeleteTaskAsync(int id, string userId);
+        Task<bool> UpdateTaskStatusAsync(int id, ProjectTaskStatus status, string userId);
     }
 }

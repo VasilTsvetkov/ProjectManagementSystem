@@ -7,7 +7,6 @@
     using Models;
     using Repositories;
     using Serilog;
-    using Serilog.Events;
     using Services;
 
     public static class ServiceCollectionExtensions
@@ -36,6 +35,8 @@
             services.AddScoped<ITimeLogService, TimeLogService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<IHomeService, HomeService>();
+            services.AddScoped<IActivityService, ActivityService>();
 
             return services;
         }

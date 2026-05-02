@@ -4,15 +4,21 @@
     using Models;
     using ViewModels.Projects;
     using Microsoft.Extensions.Logging;
+    using Enums;
 
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
+        private readonly IActivityService _activityService;
         private readonly ILogger<ProjectService> _logger;
 
-        public ProjectService(IProjectRepository projectRepository, ILogger<ProjectService> logger)
+        public ProjectService(
+            IProjectRepository projectRepository,
+            IActivityService activityService,
+            ILogger<ProjectService> logger)
         {
             _projectRepository = projectRepository;
+            _activityService = activityService;
             _logger = logger;
         }
 
@@ -76,29 +82,36 @@
 
             await _projectRepository.AddAsync(project);
 
+            await _activityService.LogAsync(creatorId, $"Created project: {model.Name}", ActivityType.ProjectAction);
+
             _logger.LogInformation("Project {ProjectName} created by user {UserId}", model.Name, creatorId);
 
             return true;
         }
 
-        public async Task<bool> UpdateProjectAsync(int id, ProjectViewModel model)
+        public async Task<bool> UpdateProjectAsync(int id, ProjectViewModel model, string userId)
         {
             var updated = await _projectRepository.UpdateProjectAsync(id, model.Name, model.Description);
 
             if (updated)
             {
+                await _activityService.LogAsync(userId, $"Updated details for project: {model.Name}", ActivityType.ProjectAction);
                 _logger.LogInformation("Project {ProjectId} updated", id);
             }
 
             return updated;
         }
 
-        public async Task<bool> DeleteProjectAsync(int id)
+        public async Task<bool> DeleteProjectAsync(int id, string userId)
         {
+            var project = await _projectRepository.GetByIdAsync(id);
+            var projectName = project?.Name ?? "Unknown Project";
+
             var deleted = await _projectRepository.DeleteAsync(id);
 
             if (deleted)
             {
+                await _activityService.LogAsync(userId, $"Deleted project: {projectName}", ActivityType.ProjectAction);
                 _logger.LogInformation("Project {ProjectId} deleted", id);
             }
 

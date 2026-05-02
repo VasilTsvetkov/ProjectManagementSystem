@@ -6,6 +6,7 @@
     public class TaskListViewModel
     {
         public int Id { get; set; }
+        public int ProjectId { get; set; }
         public string Tag { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public TaskType Type { get; set; }

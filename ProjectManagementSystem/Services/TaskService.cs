@@ -19,6 +19,7 @@
         private readonly IProjectRepository _projectRepository;
         private readonly ICommentRepository _commentRepository;
         private readonly ITimeLogRepository _timeLogRepository;
+        private readonly IActivityService _activityService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<TaskService> _logger;
 
@@ -27,6 +28,7 @@
             IProjectRepository projectRepository,
             ICommentRepository commentRepository,
             ITimeLogRepository timeLogRepository,
+            IActivityService activityService,
             UserManager<ApplicationUser> userManager,
             ILogger<TaskService> logger)
         {
@@ -34,6 +36,7 @@
             _projectRepository = projectRepository;
             _commentRepository = commentRepository;
             _timeLogRepository = timeLogRepository;
+            _activityService = activityService;
             _userManager = userManager;
             _logger = logger;
         }
@@ -54,7 +57,7 @@
                 Priority = t.Priority,
                 Status = t.Status,
                 Deadline = t.Deadline,
-                AssigneeName = UserDisplayNameHelper.GetFullName(t.Assignee)
+                AssigneeName = t.Assignee?.FullName ?? "Unassigned"
             }).ToList();
 
             return (viewModels, project.Name);
@@ -101,7 +104,7 @@
                 Priority = task.Priority,
                 Status = task.Status,
                 Deadline = task.Deadline,
-                AssigneeName = UserDisplayNameHelper.GetFullName(task.Assignee)
+                AssigneeName = task.Assignee?.FullName ?? "Unassigned"
             };
         }
 
@@ -123,14 +126,14 @@
                 Priority = task.Priority,
                 Status = task.Status,
                 Deadline = task.Deadline,
-                AssigneeName = UserDisplayNameHelper.GetFullName(task.Assignee),
-                ReporterName = UserDisplayNameHelper.GetFullName(task.Reporter),
+                AssigneeName = task.Assignee?.FullName ?? "Unassigned",
+                ReporterName = task.Reporter.FullName,
                 ProjectId = projectId,
                 Comments = comments.Select(c => new CommentListViewModel
                 {
                     Id = c.Id,
                     Content = c.Content,
-                    AuthorName = UserDisplayNameHelper.GetFullName(c.User),
+                    AuthorName = c.User.FullName,
                     CreatedAt = c.CreatedAt,
                     CanEdit = c.UserId == currentUserId
                 }),
@@ -140,7 +143,7 @@
                     Hours = t.Hours,
                     Date = t.Date,
                     Description = t.Description,
-                    UserName = UserDisplayNameHelper.GetFullName(t.User),
+                    UserName =t.User.FullName,
                     CanEdit = t.UserId == currentUserId
                 }),
                 TotalHours = timeLogs.Sum(t => t.Hours)
@@ -163,7 +166,7 @@
                 Priority = t.Priority,
                 Status = t.Status,
                 Deadline = t.Deadline,
-                AssigneeName = UserDisplayNameHelper.GetFullName(t.Assignee)
+                AssigneeName = t.Assignee?.FullName ?? "Unassigned"
             }).ToList();
 
             return (viewModels, project.Name, project.Tag);
@@ -186,11 +189,14 @@
             };
 
             await _taskRepository.AddAsync(task);
+
+            await _activityService.LogAsync(currentUserId, $"Created task: {model.Title}", ActivityType.TaskAction);
+
             _logger.LogInformation("Task {TaskTitle} created by User {UserId}", model.Title, currentUserId);
             return true;
         }
 
-        public async Task<bool> UpdateTaskAsync(int id, EditTaskViewModel model)
+        public async Task<bool> UpdateTaskAsync(int id, EditTaskViewModel model, string userId)
         {
             var dto = new UpdateTaskDto
             {
@@ -204,21 +210,37 @@
             };
 
             var updated = await _taskRepository.UpdateTaskAsync(id, dto);
-            if (updated) _logger.LogInformation("Task {TaskId} updated", id);
+            if (updated)
+            {
+                await _activityService.LogAsync(userId, $"Updated task details: {model.Title}", ActivityType.TaskAction);
+                _logger.LogInformation("Task {TaskId} updated", id);
+            }
             return updated;
         }
 
-        public async Task<bool> DeleteTaskAsync(int id)
+        public async Task<bool> DeleteTaskAsync(int id, string userId)
         {
+            var task = await _taskRepository.GetByIdAsync(id);
+            var taskTitle = task?.Title ?? "Unknown Task";
+
             var deleted = await _taskRepository.DeleteAsync(id);
-            if (deleted) _logger.LogInformation("Task {TaskId} deleted", id);
+            if (deleted)
+            {
+                await _activityService.LogAsync(userId, $"Deleted task: {taskTitle}", ActivityType.TaskAction);
+                _logger.LogInformation("Task {TaskId} deleted", id);
+            }
             return deleted;
         }
 
-        public async Task<bool> UpdateTaskStatusAsync(int id, ProjectTaskStatus status)
+        public async Task<bool> UpdateTaskStatusAsync(int id, ProjectTaskStatus status, string userId)
         {
+            var task = await _taskRepository.GetByIdAsync(id);
             var updated = await _taskRepository.UpdateStatusAsync(id, status);
-            if (updated) _logger.LogInformation("Task {TaskId} status updated to {Status}", id, status);
+            if (updated)
+            {
+                await _activityService.LogAsync(userId, $"Moved {task?.Tag} to {status}", ActivityType.TaskAction);
+                _logger.LogInformation("Task {TaskId} status updated to {Status}", id, status);
+            }
             return updated;
         }
 
@@ -228,7 +250,7 @@
                 .Select(u => new SelectListItem
                 {
                     Value = u.Id,
-                    Text = UserDisplayNameHelper.GetFullName(u)
+                    Text = u.FullName
                 }).ToListAsync();
         }
     }

@@ -23,5 +23,6 @@
         public IEnumerable<CommentListViewModel> Comments { get; set; } = [];
         public IEnumerable<TimeLogListViewModel> TimeLogs { get; set; } = [];
         public string FormattedTotalHours => TimeFormatter.Format(TotalHours);
+        public string TypeIcon => TaskHelper.GetTypeIcon(Type);
     }
 }

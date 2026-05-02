@@ -4,15 +4,25 @@
     using Models;
     using ViewModels.TimeLogs;
     using Microsoft.Extensions.Logging;
+    using Enums;
+    using Helpers;
 
     public class TimeLogService : ITimeLogService
     {
         private readonly ITimeLogRepository _timeLogRepository;
+        private readonly ITaskRepository _taskRepository;
+        private readonly IActivityService _activityService;
         private readonly ILogger<TimeLogService> _logger;
 
-        public TimeLogService(ITimeLogRepository timeLogRepository, ILogger<TimeLogService> logger)
+        public TimeLogService(
+            ITimeLogRepository timeLogRepository,
+            ITaskRepository taskRepository,
+            IActivityService activityService,
+            ILogger<TimeLogService> logger)
         {
             _timeLogRepository = timeLogRepository;
+            _taskRepository = taskRepository;
+            _activityService = activityService;
             _logger = logger;
         }
 
@@ -31,6 +41,12 @@
 
             await _timeLogRepository.AddAsync(timeLog);
 
+            var task = await _taskRepository.GetByIdAsync(model.TaskId);
+            string taskTag = task?.Tag ?? "Task";
+
+            string formattedTime = TimeFormatter.Format(totalHours);
+            await _activityService.LogAsync(userId, $"Logged {formattedTime} on {taskTag}", ActivityType.TimeLogAction);
+
             _logger.LogInformation("Time log created for Task {TaskId} by User {UserId}", model.TaskId, userId);
 
             return true;
@@ -46,10 +62,16 @@
             }
 
             var taskId = timeLog.TaskId;
+            var task = await _taskRepository.GetByIdAsync(taskId);
+            string taskTag = task?.Tag ?? "Task";
+
+            string formattedTime = TimeFormatter.Format(timeLog.Hours);
+
             var deleted = await _timeLogRepository.DeleteAsync(id);
 
             if (deleted)
             {
+                await _activityService.LogAsync(userId, $"Deleted {formattedTime} log from {taskTag}", ActivityType.TimeLogAction);
                 _logger.LogInformation("Time log {TimeLogId} deleted by User {UserId}", id, userId);
                 return (true, taskId);
             }
