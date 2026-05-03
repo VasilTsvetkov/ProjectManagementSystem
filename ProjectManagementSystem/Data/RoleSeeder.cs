@@ -1,16 +1,14 @@
 ﻿namespace ProjectManagementSystem.Data
 {
     using Constants;
-    using Enums;
-    using Helpers;
     using Microsoft.AspNetCore.Identity;
     using Models;
 
     public static class RoleSeeder
     {
-        public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            foreach (var roleName in RoleHelper.GetAllRoleNames())
+            foreach (var roleName in Roles.All)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
                 {
@@ -18,36 +16,44 @@
                 }
             }
 
-            await SeedDefaultAdminAsync(userManager);
+            await SeedDefaultAdminAsync(userManager, configuration);
         }
 
-        private static async Task SeedDefaultAdminAsync(UserManager<ApplicationUser> userManager)
+        private static async Task SeedDefaultAdminAsync(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            var adminUser = await userManager.FindByEmailAsync(SeedData.AdminEmail);
+            var adminEmail = configuration["AdminSettings:Email"];
+            var adminPassword = configuration["AdminSettings:Password"];
+
+            if (string.IsNullOrEmpty(adminEmail) || string.IsNullOrEmpty(adminPassword))
+            {
+                throw new InvalidOperationException("Critical Startup Error: Admin credentials are missing in the configuration (secrets.json). The system cannot seed the default administrator.");
+            }
+
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
             if (adminUser == null)
             {
                 adminUser = new ApplicationUser
                 {
-                    UserName = SeedData.AdminEmail,
-                    Email = SeedData.AdminEmail,
+                    UserName = adminEmail,
+                    Email = adminEmail,
                     FirstName = SeedData.AdminFirstName,
                     LastName = SeedData.AdminLastName,
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(adminUser, SeedData.AdminPassword);
+                var result = await userManager.CreateAsync(adminUser, adminPassword);
 
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, UserRole.Admin.ToRoleName());
+                    await userManager.AddToRoleAsync(adminUser, Roles.Admin);
                 }
             }
             else
             {
-                if (!await userManager.IsInRoleAsync(adminUser, UserRole.Admin.ToRoleName()))
+                if (!await userManager.IsInRoleAsync(adminUser, Roles.Admin))
                 {
-                    await userManager.AddToRoleAsync(adminUser, UserRole.Admin.ToRoleName());
+                    await userManager.AddToRoleAsync(adminUser, Roles.Admin);
                 }
             }
         }

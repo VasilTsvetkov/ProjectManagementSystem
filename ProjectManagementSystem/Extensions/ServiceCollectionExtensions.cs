@@ -67,10 +67,13 @@
 
         public static async Task SeedRolesAndAdminAsync(this IServiceProvider serviceProvider)
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            using var scope = serviceProvider.CreateScope();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            await RoleSeeder.SeedRolesAsync(roleManager, userManager);
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+            await RoleSeeder.SeedRolesAsync(roleManager, userManager, configuration);
         }
     }
 }

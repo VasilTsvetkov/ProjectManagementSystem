@@ -1,11 +1,9 @@
 ﻿namespace ProjectManagementSystem.Services
 {
-    using Enums;
-    using Helpers;
+    using Constants;
     using Interfaces;
     using Microsoft.AspNetCore.Identity;
     using Models;
-    using ProjectManagementSystem.Constants;
     using ViewModels.Admin;
 
     public class AdminService(UserManager<ApplicationUser> userManager, ILogger<AdminService> logger) : IAdminService
@@ -21,7 +19,7 @@
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                var currentRole = roles.FirstOrDefault() ?? UserRole.Member.ToRoleName();
+                var currentRole = roles.FirstOrDefault() ?? Roles.Member;
 
                 userViewModels.Add(new UserRoleViewModel
                 {
@@ -29,7 +27,7 @@
                     Email = user.Email ?? "No Email Provided",
                     FullName = user.FullName,
                     CurrentRole = currentRole,
-                    IsAdmin = currentRole == UserRole.Admin.ToRoleName()
+                    IsAdmin = currentRole == Roles.Admin
                 });
             }
 

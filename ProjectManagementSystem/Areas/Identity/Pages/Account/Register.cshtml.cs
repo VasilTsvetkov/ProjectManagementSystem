@@ -1,7 +1,6 @@
 ﻿namespace ProjectManagementSystem.Areas.Identity.Pages.Account
 {
-    using Enums;
-    using Helpers;
+    using Constants;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
@@ -94,7 +93,7 @@
             {
                 _logger.LogInformation("User created a new account with password.");
 
-                await _userManager.AddToRoleAsync(user, UserRole.Member.ToRoleName());
+                await _userManager.AddToRoleAsync(user, Roles.Member);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
 

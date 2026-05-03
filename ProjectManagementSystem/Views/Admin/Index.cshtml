@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Admin.UserRoleViewModel>
+@using ProjectManagementSystem.Constants
 @using ProjectManagementSystem.Enums
 @using ProjectManagementSystem.Helpers
 
@@ -45,7 +46,7 @@
                         {
                             <span class="badge bg-danger">@user.CurrentRole</span>
                         }
-                        else if (user.CurrentRole == UserRole.Manager.ToRoleName())
+                        else if (user.CurrentRole == Roles.Manager)
                         {
                             <span class="badge bg-warning">@user.CurrentRole</span>
                         }
@@ -63,8 +64,8 @@
                         {
                             <form asp-action="ChangeRole" asp-route-userId="@user.UserId" method="post" class="d-inline">
                                 <select name="newRole" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
-                                    <option value="@UserRole.Member.ToRoleName()" selected="@(user.CurrentRole == UserRole.Member.ToRoleName())">Member</option>
-                                    <option value="@UserRole.Manager.ToRoleName()" selected="@(user.CurrentRole == UserRole.Manager.ToRoleName())">Manager</option>
+                                    <option value="@Roles.Member" selected="@(user.CurrentRole == Roles.Member)">Member</option>
+                                    <option value="@Roles.Manager" selected="@(user.CurrentRole == Roles.Manager)">Manager</option>
                                 </select>
                             </form>
                         }
