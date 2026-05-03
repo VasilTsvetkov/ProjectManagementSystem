@@ -111,5 +111,14 @@
                 })
                 .OrderByDescending(u => u.TotalHours)];
         }
+
+        public async Task<IEnumerable<TimeLog>> GetLogsByProjectAndDateAsync(int projectId, DateTime start, DateTime end)
+            => await _context.TimeLogs
+                .Include(tl => tl.User)
+                .Include(tl => tl.Task)
+                .Where(tl => tl.Task.ProjectId == projectId &&
+                             tl.Date >= start &&
+                             tl.Date <= end)
+                .ToListAsync();
     }
 }

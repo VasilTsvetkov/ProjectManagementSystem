@@ -1,11 +1,11 @@
 ﻿namespace ProjectManagementSystem.Services
 {
     using Data;
+    using Enums;
     using Interfaces;
+    using Microsoft.EntityFrameworkCore;
     using ViewModels.Home;
     using ViewModels.Tasks;
-    using Enums;
-    using Microsoft.EntityFrameworkCore;
 
     public class HomeService(ApplicationDbContext context) : IHomeService
     {

@@ -69,7 +69,7 @@
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            
+
             await RoleSeeder.SeedRolesAsync(roleManager, userManager);
         }
     }

@@ -5,6 +5,7 @@
     using Interfaces;
     using Microsoft.AspNetCore.Identity;
     using Models;
+    using ProjectManagementSystem.Constants;
     using ViewModels.Admin;
 
     public class AdminService(UserManager<ApplicationUser> userManager, ILogger<AdminService> logger) : IAdminService
@@ -47,7 +48,7 @@
             var currentRoles = await _userManager.GetRolesAsync(user);
             var currentRole = currentRoles.FirstOrDefault();
 
-            if (currentRole == UserRole.Admin.ToRoleName())
+            if (currentRole == Roles.Admin)
             {
                 _logger.LogWarning("Security Alert: Unauthorized attempt to change Admin role for {Email}", user.Email);
                 return (false, "Cannot change Admin role.");

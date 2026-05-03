@@ -6,6 +6,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Models;
     using ViewModels.TimeLogs;
+    using Constants;
 
     [Authorize]
     [Route("timelogs")]
@@ -13,6 +14,25 @@
     {
         private readonly ITimeLogService _timeLogService = timeLogService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
+
+        [HttpGet("matrix/{projectId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Matrix(int projectId, int? month, int? year)
+        {
+            int selectedMonth = month ?? DateTime.Now.Month;
+            int selectedYear = year ?? DateTime.Now.Year;
+
+            var viewModel = await _timeLogService.GetMonthlyMatrixAsync(projectId, selectedMonth, selectedYear);
+
+            if (viewModel == null)
+            {
+                return NotFound();
+            }
+
+            return View(viewModel);
+        }
 
         [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status302Found)]
@@ -29,7 +49,12 @@
                 return Unauthorized();
             }
 
-            await _timeLogService.CreateTimeLogAsync(model, userId);
+            var success = await _timeLogService.CreateTimeLogAsync(model, userId);
+
+            if (!success)
+            {
+                TempData["Error"] = $"Daily limit reached. You cannot log more than {TimeConfig.WorkingHoursPerDay} hours per day.";
+            }
 
             return RedirectToAction("Details", "Tasks", new { projectId = model.ProjectId, id = model.TaskId });
         }

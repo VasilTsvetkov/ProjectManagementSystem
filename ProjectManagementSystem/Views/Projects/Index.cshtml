@@ -49,7 +49,16 @@ else
                                 Delete
                             </button>
                         }
-                        <a asp-controller="Tasks" asp-action="Index" asp-route-projectId="@project.Id" class="btn btn-sm btn-outline-primary">View Tasks</a>
+
+                        <a asp-controller="TimeLogs"
+                           asp-action="Matrix"
+                           asp-route-projectId="@project.Id"
+                           class="btn btn-sm btn-outline-info">Time Matrix</a>
+
+                        <a asp-controller="Tasks"
+                           asp-action="Index"
+                           asp-route-projectId="@project.Id"
+                           class="btn btn-sm btn-outline-primary">View Tasks</a>
                     </td>
                 </tr>
             }

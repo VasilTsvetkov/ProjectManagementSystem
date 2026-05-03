@@ -12,5 +12,6 @@
         Task<MonthlyStatsDto> GetMonthlyStatsAsync(int year, int month, string? userId = null);
         Task<IEnumerable<ProjectTimeDto>> GetProjectBreakdownAsync(int year, int month, string? userId = null);
         Task<IEnumerable<UserTimeDto>> GetUserBreakdownAsync(int year, int month, int? projectId = null);
+        Task<IEnumerable<TimeLog>> GetLogsByProjectAndDateAsync(int projectId, DateTime start, DateTime end);
     }
 }

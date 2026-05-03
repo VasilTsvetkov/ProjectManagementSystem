@@ -2,7 +2,6 @@
 {
     using Interfaces;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.Extensions.Logging;
     using System.Globalization;
     using ViewModels.Dashboard;
 

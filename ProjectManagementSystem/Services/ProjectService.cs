@@ -1,10 +1,10 @@
 ﻿namespace ProjectManagementSystem.Services
 {
+    using Enums;
     using Interfaces;
+    using Microsoft.Extensions.Logging;
     using Models;
     using ViewModels.Projects;
-    using Microsoft.Extensions.Logging;
-    using Enums;
 
     public class ProjectService(
         IProjectRepository projectRepository,

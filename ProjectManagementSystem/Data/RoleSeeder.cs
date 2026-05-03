@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.Data
 {
+    using Constants;
     using Enums;
     using Helpers;
     using Microsoft.AspNetCore.Identity;
@@ -22,21 +23,20 @@
 
         private static async Task SeedDefaultAdminAsync(UserManager<ApplicationUser> userManager)
         {
-            var adminEmail = "admin@pms.com";
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            var adminUser = await userManager.FindByEmailAsync(SeedData.AdminEmail);
 
             if (adminUser == null)
             {
                 adminUser = new ApplicationUser
                 {
-                    UserName = adminEmail,
-                    Email = adminEmail,
-                    FirstName = "Admin",
-                    LastName = "User",
+                    UserName = SeedData.AdminEmail,
+                    Email = SeedData.AdminEmail,
+                    FirstName = SeedData.AdminFirstName,
+                    LastName = SeedData.AdminLastName,
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(adminUser, "Admin@123");
+                var result = await userManager.CreateAsync(adminUser, SeedData.AdminPassword);
 
                 if (result.Succeeded)
                 {

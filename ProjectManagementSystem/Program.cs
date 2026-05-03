@@ -4,7 +4,7 @@ namespace ProjectManagementSystem
     using Middleware;
     using Serilog;
 
-    public class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
