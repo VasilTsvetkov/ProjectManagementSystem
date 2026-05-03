@@ -21,8 +21,8 @@
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Matrix(int projectId, int? month, int? year)
         {
-            int selectedMonth = month ?? DateTime.Now.Month;
-            int selectedYear = year ?? DateTime.Now.Year;
+            int selectedMonth = month ?? DateTime.UtcNow.Month;
+            int selectedYear = year ?? DateTime.UtcNow.Year;
 
             var viewModel = await _timeLogService.GetMonthlyMatrixAsync(projectId, selectedMonth, selectedYear);
 

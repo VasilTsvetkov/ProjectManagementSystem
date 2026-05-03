@@ -6,8 +6,8 @@
 
     public class DashboardViewModel
     {
-        public int Year { get; set; } = DateTime.Now.Year;
-        public int Month { get; set; } = DateTime.Now.Month;
+        public int Year { get; set; }
+        public int Month { get; set; }
         public string? SelectedUserId { get; set; }
         public MonthlyStatsDto Stats { get; set; } = new();
         public List<ProjectTimeDto> ProjectBreakdown { get; set; } = [];

@@ -11,8 +11,8 @@
 
         public async Task<DashboardViewModel> GetDashboardDataAsync(int? year, int? month, string userId)
         {
-            var selectedYear = year ?? DateTime.Now.Year;
-            var selectedMonth = month ?? DateTime.Now.Month;
+            var selectedYear = year ?? DateTime.UtcNow.Year;
+            var selectedMonth = month ?? DateTime.UtcNow.Month;
 
             var stats = await _timeLogRepository.GetMonthlyStatsAsync(selectedYear, selectedMonth, userId);
             var projectBreakdown = await _timeLogRepository.GetProjectBreakdownAsync(selectedYear, selectedMonth, userId);
@@ -45,7 +45,8 @@
 
         private static List<SelectListItem> GetYearSelectList()
         {
-            var currentYear = DateTime.Now.Year;
+            var currentYear = DateTime.UtcNow.Year;
+
             return Enumerable.Range(currentYear - 2, 5)
                 .Select(y => new SelectListItem
                 {

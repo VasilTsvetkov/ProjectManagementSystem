@@ -20,8 +20,8 @@
 
             <a asp-action="Matrix"
                asp-route-projectId="@Model.ProjectId"
-               asp-route-month="@DateTime.Now.Month"
-               asp-route-year="@DateTime.Now.Year"
+               asp-route-month="@DateTime.UtcNow.Month"
+               asp-route-year="@DateTime.UtcNow.Year"
                class="btn btn-outline-primary">Current Month</a>
 
             <a asp-action="Matrix"

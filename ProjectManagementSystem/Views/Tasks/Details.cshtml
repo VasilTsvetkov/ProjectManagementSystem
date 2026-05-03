@@ -59,7 +59,7 @@
         </div>
         <div class="col-auto">
             <label class="form-label">Date</label>
-            <input type="date" name="Date" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" />
+            <input type="date" name="Date" value="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")" class="form-control" />
         </div>
         <div class="col">
             <label class="form-label">Description</label>

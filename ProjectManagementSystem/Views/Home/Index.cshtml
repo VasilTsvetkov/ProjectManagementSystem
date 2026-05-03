@@ -13,7 +13,7 @@
         </div>
         <div class="text-end">
             <span class="badge bg-light text-dark border shadow-sm px-3 py-2">
-                <i class="far fa-calendar-alt me-2 text-primary"></i>@DateTime.Now.ToString("D")
+                <i class="far fa-calendar-alt me-2 text-primary"></i>@DateTime.UtcNow.ToString("D")
             </span>
         </div>
     </div>
@@ -89,7 +89,7 @@
                                         <td>
                                             <span class="fw-bold text-dark">@task.Title</span>
                                         </td>
-                                        <td class="@(task.Deadline < DateTime.Now ? "text-danger fw-bold" : "")">
+                                        <td class="@(task.Deadline < DateTime.UtcNow ? "text-danger fw-bold" : "")">
                                             <i class="far fa-clock me-1"></i>@task.Deadline?.ToString("MMM dd")
                                         </td>
                                         <td>
