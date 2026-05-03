@@ -1,12 +1,12 @@
 ﻿namespace ProjectManagementSystem.Controllers
 {
+    using Constants;
     using Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Models;
     using ViewModels.TimeLogs;
-    using Constants;
 
     [Authorize]
     [Route("timelogs")]

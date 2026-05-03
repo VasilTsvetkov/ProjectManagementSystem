@@ -131,7 +131,7 @@
                     Hours = t.Hours,
                     Date = t.Date,
                     Description = t.Description,
-                    UserName =t.User.FullName,
+                    UserName = t.User.FullName,
                     CanEdit = t.UserId == currentUserId
                 }),
                 TotalHours = timeLogs.Sum(t => t.Hours)

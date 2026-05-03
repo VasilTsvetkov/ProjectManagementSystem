@@ -1,9 +1,9 @@
 ﻿namespace ProjectManagementSystem.Enums
 {
-	public enum TaskType
-	{
-		Bug,
-		Feature,
-		Task
-	}
+    public enum TaskType
+    {
+        Bug,
+        Feature,
+        Task
+    }
 }

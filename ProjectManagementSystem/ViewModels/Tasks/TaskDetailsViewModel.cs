@@ -3,8 +3,8 @@
     using Comments;
     using Enums;
     using Helpers;
-    using TimeLogs;
     using System.Collections.Generic;
+    using TimeLogs;
 
     public class TaskDetailsViewModel
     {

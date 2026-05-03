@@ -1,9 +1,9 @@
 ﻿namespace ProjectManagementSystem.Services
 {
     using Data;
-    using Models;
     using Enums;
     using Interfaces;
+    using Models;
 
     public class ActivityService(ApplicationDbContext context) : IActivityService
     {
