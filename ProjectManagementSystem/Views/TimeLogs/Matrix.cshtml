@@ -76,7 +76,7 @@
 
 								@foreach (var day in Model.DaysInMonth)
 								{
-									var hours = row.DailyHours[day.Day];
+									var hours = row.DailyHours.ContainsKey(day.Day) ? row.DailyHours[day.Day] : 0;
 									var isWeekend = day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday;
 
 									<td class="text-center @(hours > 0 ? "table-primary border-primary-subtle" : (isWeekend ? "bg-light" : ""))">

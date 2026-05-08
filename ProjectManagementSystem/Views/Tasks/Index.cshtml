@@ -88,7 +88,7 @@ else
                                         </a>
                                         <button type="button"
                                                 class="btn btn-sm btn-white border"
-                                                onclick="confirmDelete('@Url.Action("Delete", "Tasks", new { projectId = projectId, id = task.Id })', '@task.Tag')">
+                                                onclick="confirmDelete('@Url.Action("Delete", "Tasks", new { projectId = projectId, id = task.Id })', '@task.Tag', 'task')">
                                             <i class="bi bi-trash text-danger"></i>
                                         </button>
                                     }

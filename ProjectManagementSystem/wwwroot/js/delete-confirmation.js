@@ -6,7 +6,11 @@
     if (modalElement && form && message) {
         form.action = url;
 
-        message.innerHTML = `Are you sure you want to delete ${itemType} <strong>"${itemName}"</strong>?`;
+        const displayName = itemName
+            ? `${itemType} <strong>"${itemName}"</strong>`
+            : itemType;
+
+        message.innerHTML = `Are you sure you want to delete ${displayName}?`;
 
         const modal = new bootstrap.Modal(modalElement);
         modal.show();

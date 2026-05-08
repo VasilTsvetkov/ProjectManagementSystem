@@ -34,32 +34,44 @@
             return View(viewModel);
         }
 
-        [HttpPost("create")]
-        [ProducesResponseType(StatusCodes.Status302Found)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create(TimeLogViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
+		[HttpPost("create")]
+		[ProducesResponseType(StatusCodes.Status302Found)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		public async Task<IActionResult> Create(TimeLogViewModel model)
+		{
+			if (!ModelState.IsValid)
+				return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
 
-            var userId = _userManager.GetUserId(User);
+			var userId = _userManager.GetUserId(User);
 
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+			if (userId == null)
+			{
+				return Unauthorized();
+			}
 
-            var success = await _timeLogService.CreateTimeLogAsync(model, userId);
+			if (model.Date.Date > DateTime.UtcNow.Date)
+			{
+				TempData[NotificationKeys.Error] = "You cannot log time for future dates.";
+				return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
+			}
 
-            if (!success)
-            {
-                TempData[NotificationKeys.Error] = $"Daily limit reached. You cannot log more than {TimeConfig.WorkingHoursPerDay} hours per day.";
-            }
+			if (model.Hours == 0 && model.Minutes == 0 && model.Days == 0)
+			{
+				TempData[NotificationKeys.Error] = "Please enter the amount of time worked.";
+				return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
+			}
 
-            return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
-        }
+			var success = await _timeLogService.CreateTimeLogAsync(model, userId);
 
-        [HttpPost("{id}/delete")]
+			if (!success)
+			{
+				TempData[NotificationKeys.Error] = $"Daily limit reached. You cannot log more than {TimeConfig.WorkingHoursPerDay} hours per day.";
+			}
+
+			return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
+		}
+
+		[HttpPost("{id}/delete")]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

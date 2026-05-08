@@ -37,7 +37,6 @@
                         <h6 class="fw-bold text-uppercase mb-0 text-secondary" style="letter-spacing: 0.5px; font-size: 0.7rem;">
                             @status.GetDisplayName()
                         </h6>
-                        @* Added 'status-counter' class here *@
                         <span class="badge bg-white text-dark border rounded-pill shadow-sm small status-counter">
                             @Model.Count(t => t.Status == status)
                         </span>
@@ -151,7 +150,6 @@
                 animation: 250,
                 ghostClass: 'sortable-ghost',
                 onEnd: async function (evt) {
-                    // Update counters immediately for smooth UI
                     updateCounters();
 
                     const taskId = evt.item.dataset.id;

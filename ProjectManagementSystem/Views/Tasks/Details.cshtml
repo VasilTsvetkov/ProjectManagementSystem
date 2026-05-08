@@ -57,14 +57,14 @@
                             <div class="row g-2 align-items-end">
                                 <div class="col-md-2">
                                     <label class="form-label small fw-bold text-muted">Days</label>
-                                    <input type="number" name="Days" min="0" max="99" value="0" class="form-control form-control-sm" />
+                                    <input type="number" name="Days" min="0" max="1" value="0" class="form-control form-control-sm" />
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label small fw-bold text-muted">Hours</label>
-                                    <input type="number" name="Hours" min="0" max="23" value="0" class="form-control form-control-sm" />
+                                    <input type="number" name="Hours" min="0" max="8" value="0" class="form-control form-control-sm" />
                                 </div>
                                 <div class="col-md-2">
-                                    <label class="form-label small fw-bold text-muted">Min</label>
+                                    <label class="form-label small fw-bold text-muted">Minutes</label>
                                     <input type="number" name="Minutes" min="0" max="59" value="0" class="form-control form-control-sm" />
                                 </div>
                                 <div class="col-md-3">
@@ -110,7 +110,6 @@
                                     </div>
                                     @if (log.CanEdit)
                                     {
-                                        @* UPDATED: Added 3rd parameter 'time log' *@
                                         <button type="button" class="btn btn-link text-danger p-0 opacity-50 hover-opacity-100"
                                                 onclick="confirmDelete('@Url.Action("Delete", "TimeLogs", new { id = log.Id, projectId = Model.ProjectId })', '@log.FormattedHours', 'time log')">
                                             <i class="bi bi-trash"></i>
@@ -156,10 +155,11 @@
                                     @if (comment.CanEdit)
                                     {
                                         <div class="mt-1 ps-2">
-                                            <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="text-muted small text-decoration-none me-2 hover-text-primary">Edit</a>
-                                            @* UPDATED: Added 3rd parameter 'comment' *@
-                                            <button type="button" class="btn btn-link p-0 text-danger small text-decoration-none"
-                                                    onclick="confirmDelete('@Url.Action("Delete", "Comments", new { id = comment.Id, projectId = Model.ProjectId })', 'your comment', 'comment')">
+                                            <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id"
+                                               class="text-muted small text-decoration-none me-2 hover-text-primary">Edit</a>
+                                            <button type="button"
+                                                    class="border-0 bg-transparent p-0 text-danger small text-decoration-none hover-opacity-100"
+                                                    onclick="confirmDelete('@Url.Action("Delete", "Comments", new { id = comment.Id, projectId = Model.ProjectId })', '', 'this comment')">
                                                 Delete
                                             </button>
                                         </div>

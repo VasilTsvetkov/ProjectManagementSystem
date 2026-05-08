@@ -14,8 +14,9 @@
             var selectedYear = year ?? DateTime.UtcNow.Year;
             var selectedMonth = month ?? DateTime.UtcNow.Month;
 
-            var stats = await _timeLogRepository.GetMonthlyStatsAsync(selectedYear, selectedMonth, userId);
-            var projectBreakdown = await _timeLogRepository.GetProjectBreakdownAsync(selectedYear, selectedMonth, userId);
+            var stats = await _timeLogRepository.GetMonthlyStatsAsync(selectedYear, selectedMonth, null);
+            var projectBreakdown = await _timeLogRepository.GetProjectBreakdownAsync(selectedYear, selectedMonth, null);
+            var userBreakdown = await _timeLogRepository.GetUserBreakdownAsync(selectedYear, selectedMonth);
 
             return new DashboardViewModel
             {
@@ -24,11 +25,15 @@
                 SelectedUserId = userId,
                 Stats = stats,
                 ProjectBreakdown = projectBreakdown.ToList(),
-                UserBreakdown = [],
+                UserBreakdown = userBreakdown.ToList(),
                 AvailableMonths = GetMonthSelectList(),
                 AvailableYears = GetYearSelectList(),
-                AvailableUsers = [],
-                CanViewAllUsers = false
+                AvailableUsers = userBreakdown.Select(u => new SelectListItem
+                {
+                    Value = u.UserId,
+                    Text = u.UserName
+                }).ToList(),
+                CanViewAllUsers = true
             };
         }
 

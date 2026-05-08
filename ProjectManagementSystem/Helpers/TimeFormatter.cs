@@ -1,26 +1,29 @@
 ﻿namespace ProjectManagementSystem.Helpers
 {
-    using Constants;
-    using System.Collections.Generic;
+	using Constants;
+	using System;
+	using System.Collections.Generic;
 
-    public static class TimeFormatter
-    {
-        public static string Format(double totalHours)
-        {
-            var totalMinutes = (int)(totalHours * TimeConfig.MinutesInHour);
+	public static class TimeFormatter
+	{
+		public static string Format(double totalHours)
+		{
+			if (totalHours <= 0.001) return ".";
 
-            var days = totalMinutes / (TimeConfig.WorkingHoursPerDay * TimeConfig.MinutesInHour);
-            var remainingMinutesAfterDays = totalMinutes % (TimeConfig.WorkingHoursPerDay * TimeConfig.MinutesInHour);
+			var totalMinutes = (int)Math.Round(totalHours * TimeConfig.MinutesInHour);
 
-            var h = remainingMinutesAfterDays / TimeConfig.MinutesInHour;
-            var m = remainingMinutesAfterDays % TimeConfig.MinutesInHour;
+			var days = totalMinutes / (TimeConfig.WorkingHoursPerDay * TimeConfig.MinutesInHour);
+			var remainingAfterDays = totalMinutes % (TimeConfig.WorkingHoursPerDay * TimeConfig.MinutesInHour);
 
-            var parts = new List<string>();
-            if (days > 0) parts.Add($"{days}d");
-            if (h > 0) parts.Add($"{h}h");
-            if (m > 0) parts.Add($"{m}m");
+			var h = remainingAfterDays / TimeConfig.MinutesInHour;
+			var m = remainingAfterDays % TimeConfig.MinutesInHour;
 
-            return parts.Count > 0 ? string.Join(" ", parts) : "0m";
-        }
-    }
+			var parts = new List<string>();
+			if (days > 0) parts.Add($"{days}d");
+			if (h > 0) parts.Add($"{h}h");
+			if (m > 0) parts.Add($"{m}m");
+
+			return parts.Count > 0 ? string.Join(" ", parts) : ".";
+		}
+	}
 }

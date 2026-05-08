@@ -16,7 +16,6 @@
 
         public bool CanEdit { get; init; }
 
-        // Logic for the View to consume easily
         public string FormattedHours => TimeFormatter.Format(Hours);
     }
 }

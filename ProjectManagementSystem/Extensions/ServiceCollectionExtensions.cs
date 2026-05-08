@@ -5,25 +5,27 @@
     using Interfaces;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
-    using Models;
-    using Repositories;
+	using Models;
+	using Repositories;
     using Serilog;
     using Services;
 
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
-        {
-            var connectionString = configuration[AppSettingKeys.DefaultConnection];
+		public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+		{
+			var connectionString = configuration[AppSettingKeys.DefaultConnection];
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
-            services.AddDatabaseDeveloperPageExceptionFilter();
+			services.AddDbContext<ApplicationDbContext>(options =>
+				options.UseSqlServer(connectionString, sqlOptions =>
+					sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
-            return services;
-        }
+			services.AddDatabaseDeveloperPageExceptionFilter();
 
-        public static IServiceCollection AddIdentityServices(this IServiceCollection services)
+			return services;
+		}
+
+		public static IServiceCollection AddIdentityServices(this IServiceCollection services)
         {
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
