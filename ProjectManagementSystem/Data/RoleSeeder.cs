@@ -21,12 +21,12 @@
 
         private static async Task SeedDefaultAdminAsync(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            var adminEmail = configuration["AdminSettings:Email"];
-            var adminPassword = configuration["AdminSettings:Password"];
+            var adminEmail = configuration[AppSettingKeys.AdminEmail];
+            var adminPassword = configuration[AppSettingKeys.AdminPassword];
 
-            if (string.IsNullOrEmpty(adminEmail) || string.IsNullOrEmpty(adminPassword))
+            if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
             {
-                throw new InvalidOperationException("Critical Startup Error: Admin credentials are missing in the configuration (secrets.json). The system cannot seed the default administrator.");
+                throw new InvalidOperationException("Critical Startup Error: Admin credentials are missing!");
             }
 
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
@@ -44,17 +44,16 @@
 
                 var result = await userManager.CreateAsync(adminUser, adminPassword);
 
-                if (result.Succeeded)
+                if (!result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, Roles.Admin);
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    throw new Exception($"Failed to create seed Admin user: {errors}");
                 }
             }
-            else
+
+            if (!await userManager.IsInRoleAsync(adminUser, Roles.Admin))
             {
-                if (!await userManager.IsInRoleAsync(adminUser, Roles.Admin))
-                {
-                    await userManager.AddToRoleAsync(adminUser, Roles.Admin);
-                }
+                await userManager.AddToRoleAsync(adminUser, Roles.Admin);
             }
         }
     }

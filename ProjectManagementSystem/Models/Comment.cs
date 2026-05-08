@@ -3,11 +3,17 @@
     public class Comment
     {
         public int Id { get; set; }
-        public string Content { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public int TaskId { get; set; }
-        public ProjectTask Task { get; set; } = null!;
-        public string UserId { get; set; } = string.Empty;
-        public ApplicationUser User { get; set; } = null!;
+
+        public required string Content { get; set; }
+
+        public required DateTime CreatedAt { get; set; }
+
+        public required int TaskId { get; set; }
+
+        public virtual ProjectTask Task { get; set; } = null!;
+
+        public required string UserId { get; set; }
+
+        public virtual ApplicationUser User { get; set; } = null!;
     }
 }

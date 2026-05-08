@@ -56,7 +56,7 @@
             public string Password { get; set; } = string.Empty;
 
             [DataType(DataType.Password)]
-            [Compare("Password")]
+            [Compare(nameof(Password))]
             [DisplayName("Confirm Password")]
             public string ConfirmPassword { get; set; } = string.Empty;
         }

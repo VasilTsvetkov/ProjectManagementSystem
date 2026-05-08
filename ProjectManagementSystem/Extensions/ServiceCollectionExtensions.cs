@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.Extensions
 {
+    using Constants;
     using Data;
     using Interfaces;
     using Microsoft.AspNetCore.Identity;
@@ -13,9 +14,12 @@
     {
         public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
+            var connectionString = configuration[AppSettingKeys.DefaultConnection];
+
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(connectionString));
             services.AddDatabaseDeveloperPageExceptionFilter();
+
             return services;
         }
 
@@ -24,6 +28,7 @@
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
             return services;
         }
 

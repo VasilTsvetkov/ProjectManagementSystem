@@ -1,6 +1,6 @@
-﻿namespace ProjectManagementSystem.Enums
+﻿namespace ProjectManagementSystem.Enums.Task
 {
-    public enum TaskPriority
+    public enum Priority
     {
         Low,
         Medium,

@@ -1,7 +1,9 @@
 ﻿namespace ProjectManagementSystem.Services
 {
+    using Constants;
     using DTOs;
     using Enums;
+    using Enums.Task;
     using Interfaces;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc.Rendering;
@@ -39,22 +41,25 @@
             var viewModels = tasks.Select(t => new TaskListViewModel
             {
                 Id = t.Id,
-                Tag = t.Tag,
+                Tag = t.Tag ?? MessageConstants.UntitledTask,
                 Title = t.Title,
                 Type = t.Type,
                 Priority = t.Priority,
                 Status = t.Status,
                 Deadline = t.Deadline,
-                AssigneeName = t.Assignee?.FullName ?? "Unassigned"
+                AssigneeName = t.Assignee?.FullName ?? MessageConstants.Unassigned
             }).ToList();
 
-            return (viewModels, project.Name);
+            return (viewModels, project.Name ?? MessageConstants.UntitledProject);
         }
 
         public async Task<TaskViewModel> GetTaskViewModelForCreateAsync()
         {
             return new TaskViewModel
             {
+                Title = string.Empty,
+                Type = Type.Task,
+                Priority = Priority.Low,
                 Users = await GetUserSelectListAsync()
             };
         }
@@ -85,14 +90,15 @@
             return new TaskDetailsViewModel
             {
                 Id = task.Id,
-                Tag = task.Tag,
+                Tag = task.Tag ?? MessageConstants.UntitledTask,
                 Title = task.Title,
                 Description = task.Description,
                 Type = task.Type,
                 Priority = task.Priority,
                 Status = task.Status,
                 Deadline = task.Deadline,
-                AssigneeName = task.Assignee?.FullName ?? "Unassigned"
+                AssigneeName = task.Assignee?.FullName ?? MessageConstants.Unassigned,
+                ReporterName = task.Reporter?.FullName ?? MessageConstants.SystemUser
             };
         }
 
@@ -107,14 +113,14 @@
             return new TaskDetailsViewModel
             {
                 Id = task.Id,
-                Tag = task.Tag,
+                Tag = task.Tag ?? MessageConstants.UntitledTask,
                 Title = task.Title,
                 Description = task.Description,
                 Type = task.Type,
                 Priority = task.Priority,
                 Status = task.Status,
                 Deadline = task.Deadline,
-                AssigneeName = task.Assignee?.FullName ?? "Unassigned",
+                AssigneeName = task.Assignee?.FullName ?? MessageConstants.Unassigned,
                 ReporterName = task.Reporter.FullName,
                 ProjectId = projectId,
                 Comments = comments.Select(c => new CommentListViewModel
@@ -124,7 +130,7 @@
                     AuthorName = c.User.FullName,
                     CreatedAt = c.CreatedAt,
                     CanEdit = c.UserId == currentUserId
-                }),
+                }).ToList(),
                 TimeLogs = timeLogs.Select(t => new TimeLogListViewModel
                 {
                     Id = t.Id,
@@ -133,7 +139,7 @@
                     Description = t.Description,
                     UserName = t.User.FullName,
                     CanEdit = t.UserId == currentUserId
-                }),
+                }).ToList(),
                 TotalHours = timeLogs.Sum(t => t.Hours)
             };
         }
@@ -148,16 +154,16 @@
             var viewModels = tasks.Select(t => new TaskListViewModel
             {
                 Id = t.Id,
-                Tag = t.Tag,
+                Tag = t.Tag ?? MessageConstants.UntitledTask,
                 Title = t.Title,
                 Type = t.Type,
                 Priority = t.Priority,
                 Status = t.Status,
                 Deadline = t.Deadline,
-                AssigneeName = t.Assignee?.FullName ?? "Unassigned"
+                AssigneeName = t.Assignee?.FullName ?? MessageConstants.Unassigned
             }).ToList();
 
-            return (viewModels, project.Name, project.Tag);
+            return (viewModels, project.Name ?? MessageConstants.UntitledProject, project.Tag ?? MessageConstants.UntitledProject);
         }
 
         public async Task<bool> CreateTaskAsync(int projectId, TaskViewModel model, string currentUserId)
@@ -168,7 +174,7 @@
                 Description = model.Description,
                 Type = model.Type,
                 Priority = model.Priority,
-                Status = ProjectTaskStatus.ToDo,
+                Status = Status.ToDo,
                 Deadline = model.Deadline,
                 ProjectId = projectId,
                 AssigneeId = model.AssigneeId,
@@ -178,9 +184,12 @@
 
             await _taskRepository.AddAsync(task);
 
-            await _activityService.LogAsync(currentUserId, $"Created task: {model.Title}", ActivityType.TaskAction);
+            await _activityService.LogAsync(
+                currentUserId,
+                string.Format(MessageConstants.ActivityCreatedTask, model.Title),
+                ActivityType.TaskAction);
 
-            _logger.LogInformation("Task {TaskTitle} created by User {UserId}", model.Title, currentUserId);
+            _logger.LogInformation("Task {TaskTitle} created by User {UserId} in Project {ProjectId}", model.Title, currentUserId, projectId);
             return true;
         }
 
@@ -200,8 +209,12 @@
             var updated = await _taskRepository.UpdateTaskAsync(id, dto);
             if (updated)
             {
-                await _activityService.LogAsync(userId, $"Updated task details: {model.Title}", ActivityType.TaskAction);
-                _logger.LogInformation("Task {TaskId} updated", id);
+                await _activityService.LogAsync(
+                    userId,
+                    string.Format(MessageConstants.ActivityUpdatedTask, model.Title),
+                    ActivityType.TaskAction);
+
+                _logger.LogInformation("Task {TaskId} updated by User {UserId}", id, userId);
             }
             return updated;
         }
@@ -209,25 +222,35 @@
         public async Task<bool> DeleteTaskAsync(int id, string userId)
         {
             var task = await _taskRepository.GetByIdAsync(id);
-            var taskTitle = task?.Title ?? "Unknown Task";
+            var taskTitle = task?.Title ?? MessageConstants.MissingTaskIdentifier;
 
             var deleted = await _taskRepository.DeleteAsync(id);
             if (deleted)
             {
-                await _activityService.LogAsync(userId, $"Deleted task: {taskTitle}", ActivityType.TaskAction);
-                _logger.LogInformation("Task {TaskId} deleted", id);
+                await _activityService.LogAsync(
+                    userId,
+                    string.Format(MessageConstants.ActivityDeletedTask, taskTitle),
+                    ActivityType.TaskAction);
+
+                _logger.LogInformation("Task {TaskId} deleted by User {UserId}", id, userId);
             }
             return deleted;
         }
 
-        public async Task<bool> UpdateTaskStatusAsync(int id, ProjectTaskStatus status, string userId)
+        public async Task<bool> UpdateTaskStatusAsync(int id, Status status, string userId)
         {
             var task = await _taskRepository.GetByIdAsync(id);
+            var taskTag = task?.Tag ?? MessageConstants.UntitledTask;
+
             var updated = await _taskRepository.UpdateStatusAsync(id, status);
             if (updated)
             {
-                await _activityService.LogAsync(userId, $"Moved {task?.Tag} to {status}", ActivityType.TaskAction);
-                _logger.LogInformation("Task {TaskId} status updated to {Status}", id, status);
+                await _activityService.LogAsync(
+                    userId,
+                    string.Format(MessageConstants.ActivityMovedTask, taskTag, status),
+                    ActivityType.TaskAction);
+
+                _logger.LogInformation("Task {TaskId} status updated to {Status} by User {UserId}", id, status, userId);
             }
             return updated;
         }

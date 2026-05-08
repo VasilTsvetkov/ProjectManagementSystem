@@ -2,11 +2,16 @@
 {
     public class ProjectTimeDto
     {
-        public int ProjectId { get; set; }
-        public string ProjectName { get; set; } = string.Empty;
-        public string ProjectTag { get; set; } = string.Empty;
-        public double TotalHours { get; set; }
-        public int TaskCount { get; set; }
-        public int LogCount { get; set; }
+        public required int ProjectId { get; init; }
+
+        public required string ProjectName { get; init; }
+
+        public required string ProjectTag { get; init; }
+
+        public required double TotalHours { get; init; }
+
+        public required int TaskCount { get; init; }
+
+        public required int LogCount { get; init; }
     }
 }

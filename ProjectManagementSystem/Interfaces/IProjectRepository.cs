@@ -6,6 +6,6 @@
     {
         new Task AddAsync(Project entity);
 
-        Task<bool> UpdateProjectAsync(int id, string name, string description);
+        Task<bool> UpdateProjectAsync(int id, string name, string? description);
     }
 }

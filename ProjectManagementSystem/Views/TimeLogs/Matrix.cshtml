@@ -1,110 +1,149 @@
-﻿@using ProjectManagementSystem.Helpers
-@model ProjectManagementSystem.ViewModels.TimeLogs.MonthlyMatrixViewModel
+﻿@model MonthlyMatrixViewModel
 
 @{
-    ViewData["Title"] = $"{Model.ProjectName} - Time Matrix";
-    var prevMonth = Model.SelectedMonth.AddMonths(-1);
-    var nextMonth = Model.SelectedMonth.AddMonths(1);
+	ViewData["Title"] = $"{Model.ProjectName} - Time Matrix";
+	var prevMonth = Model.SelectedMonth.AddMonths(-1);
+	var nextMonth = Model.SelectedMonth.AddMonths(1);
 }
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>@Model.ProjectName - @Model.SelectedMonth.ToString("MMMM yyyy")</h2>
+<div class="container-fluid py-4">
+	<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+		<div class="d-flex align-items-center">
+			<a asp-controller="Projects" asp-action="Index" class="btn btn-sm btn-white border shadow-sm me-3">
+				<i class="bi bi-arrow-left"></i>
+			</a>
+			<div>
+				<h2 class="h4 mb-0 fw-bold text-dark">@Model.ProjectName</h2>
+				<p class="text-muted small mb-0">
+					<i class="bi bi-calendar3 me-1"></i> @Model.SelectedMonth.ToString(TimeConfig.MonthDisplayFormat)
+				</p>
+			</div>
+		</div>
 
-        <div class="btn-group shadow-sm">
-            <a asp-action="Matrix"
-               asp-route-projectId="@Model.ProjectId"
-               asp-route-month="@prevMonth.Month"
-               asp-route-year="@prevMonth.Year"
-               class="btn btn-outline-secondary">&laquo; Previous</a>
+		<div class="btn-group shadow-sm">
+			<a asp-action="Matrix"
+			   asp-route-projectId="@Model.ProjectId"
+			   asp-route-month="@prevMonth.Month"
+			   asp-route-year="@prevMonth.Year"
+			   class="btn btn-white border text-secondary">
+				<i class="bi bi-chevron-left small"></i>
+			</a>
 
-            <a asp-action="Matrix"
-               asp-route-projectId="@Model.ProjectId"
-               asp-route-month="@DateTime.UtcNow.Month"
-               asp-route-year="@DateTime.UtcNow.Year"
-               class="btn btn-outline-primary">Current Month</a>
+			<a asp-action="Matrix"
+			   asp-route-projectId="@Model.ProjectId"
+			   asp-route-month="@DateTime.UtcNow.Month"
+			   asp-route-year="@DateTime.UtcNow.Year"
+			   class="btn btn-white border fw-medium text-primary px-3">
+				Today
+			</a>
 
-            <a asp-action="Matrix"
-               asp-route-projectId="@Model.ProjectId"
-               asp-route-month="@nextMonth.Month"
-               asp-route-year="@nextMonth.Year"
-               class="btn btn-outline-secondary">Next &raquo;</a>
-        </div>
-    </div>
+			<a asp-action="Matrix"
+			   asp-route-projectId="@Model.ProjectId"
+			   asp-route-month="@nextMonth.Month"
+			   asp-route-year="@nextMonth.Year"
+			   class="btn btn-white border text-secondary">
+				<i class="bi bi-chevron-right small"></i>
+			</a>
+		</div>
+	</div>
 
-    <div class="card shadow border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-bordered mb-0">
-                    <thead>
-                        <tr>
-                            @* Sticky User Column Header *@
-                            <th style="min-width: 200px; position: sticky; left: 0; z-index: 15; background: #f8f9fa;" class="align-middle">User</th>
+	<div class="card shadow-sm border-0 overflow-hidden">
+		<div class="card-body p-0">
+			<div class="table-responsive matrix-container">
+				<table class="table table-hover align-middle mb-0">
+					<thead>
+						<tr>
+							<th class="sticky-col main-header py-3 ps-4" style="left: 0; min-width: 220px;">User</th>
 
-                            @foreach (var day in Model.DaysInMonth)
-                            {
-                                var isWeekend = day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday;
-                                <th class="text-center @(isWeekend ? "bg-warning-subtle text-danger" : "bg-light")" style="min-width: 50px;">
-                                    <small class="d-block opacity-75">@day.ToString("ddd")</small>
-                                    <strong>@day.Day</strong>
-                                </th>
-                            }
-                            <th class="text-center bg-dark text-white align-middle" style="min-width: 90px;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var row in Model.Rows)
-                        {
-                            <tr>
-                                @* Sticky User Name Cell *@
-                                <td style="position: sticky; left: 0; z-index: 10; background: white; font-weight: 600; border-right: 2px solid #dee2e6;">
-                                    @row.FullName
-                                </td>
+							@foreach (var day in Model.DaysInMonth)
+							{
+								var isWeekend = day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday;
+								<th class="text-center py-2 @(isWeekend ? "bg-light text-danger" : "bg-light-subtle")" style="min-width: 60px;">
+									<small class="d-block text-uppercase opacity-50 fw-bold" style="font-size: 0.6rem;">@day.ToString("ddd")</small>
+									<span class="fs-6 fw-bold">@day.Day</span>
+								</th>
+							}
+							<th class="text-center bg-dark text-white py-3" style="min-width: 100px;">Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var row in Model.Rows)
+						{
+							<tr>
+								<td class="sticky-col bg-white fw-bold border-end ps-4" style="left: 0;">
+									@row.FullName
+								</td>
 
-                                @foreach (var day in Model.DaysInMonth)
-                                {
-                                    var hours = row.DailyHours[day.Day];
-                                    var isWeekend = day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday;
+								@foreach (var day in Model.DaysInMonth)
+								{
+									var hours = row.DailyHours[day.Day];
+									var isWeekend = day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday;
 
-                                    <td class="text-center @(hours > 0 ? "table-primary" : (isWeekend ? "bg-light opacity-50" : ""))">
-                                        @if (hours > 0)
-                                        {
-                                            <span class="fw-bold">@TimeFormatter.Format(hours)</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted opacity-25">.</span>
-                                        }
-                                    </td>
-                                }
+									<td class="text-center @(hours > 0 ? "table-primary border-primary-subtle" : (isWeekend ? "bg-light" : ""))">
+										@if (hours > 0)
+										{
+											<span class="fw-bold text-primary small">@TimeFormatter.Format(hours)</span>
+										}
+										else
+										{
+											<span class="text-muted opacity-25">.</span>
+										}
+									</td>
+								}
 
-                                <td class="text-center fw-bold bg-light" style="border-left: 2px solid #dee2e6;">
-                                    @TimeFormatter.Format(row.TotalHours)
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+								<td class="text-center fw-bold bg-light-subtle border-start border-2 text-dark">
+									@TimeFormatter.Format(row.TotalHours)
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 </div>
 
 <style>
-    .table-responsive {
-        max-height: 75vh;
-        overflow-y: auto;
-        overflow-x: auto;
-    }
+	.matrix-container {
+		max-height: 75vh;
+		overflow: auto;
+	}
 
-    thead th {
-        position: sticky;
-        top: 0;
-        z-index: 11;
-        box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
-    }
+	.sticky-col {
+		position: sticky;
+		z-index: 5;
+	}
 
-    tbody tr:hover {
-        background-color: rgba(0,0,0,.02);
-    }
+	.main-header {
+		z-index: 10 !important;
+		background-color: #f8f9fa !important;
+		border-bottom: 2px solid #dee2e6;
+	}
+
+	.btn-white {
+		background-color: #fff;
+	}
+
+		.btn-white:hover {
+			background-color: #f8f9fa;
+			border-color: #dee2e6;
+		}
+
+	.matrix-container::-webkit-scrollbar {
+		height: 8px;
+		width: 8px;
+	}
+
+	.matrix-container::-webkit-scrollbar-track {
+		background: #f1f1f1;
+	}
+
+	.matrix-container::-webkit-scrollbar-thumb {
+		background: #ccc;
+		border-radius: 4px;
+	}
+
+		.matrix-container::-webkit-scrollbar-thumb:hover {
+			background: #aaa;
+		}
 </style>

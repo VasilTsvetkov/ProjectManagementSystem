@@ -1,86 +1,181 @@
-﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Tasks.TaskListViewModel>
-@using ProjectManagementSystem.Enums
-@using ProjectManagementSystem.Helpers
+﻿@model IEnumerable<TaskListViewModel>
 
 @{
     ViewData["Title"] = "Board";
-    var statuses = Enum.GetValues<ProjectTaskStatus>();
+    var statuses = Enum.GetValues<Status>();
+    var projectTag = ViewBag.ProjectTag as string ?? "";
+    var projectColor = ColorHelper.GetProjectColor(projectTag);
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>@ViewBag.ProjectName - Board</h2>
-    <a asp-action="Index" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-outline-secondary">List View</a>
-</div>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0 fw-bold text-dark">@ViewBag.ProjectName</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Index" class="text-decoration-none">Projects</a></li>
+                    <li class="breadcrumb-item active text-primary fw-medium">Board View</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="btn-group shadow-sm">
+            <a asp-action="Index" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-white border btn-sm px-3">
+                <i class="bi bi-list-task me-1"></i> List
+            </a>
+            <button class="btn btn-primary btn-sm px-3" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        </div>
+    </div>
 
-<div class="d-flex gap-3 overflow-auto pb-3">
-    @foreach (var status in statuses)
-    {
-        <div class="flex-shrink-0" style="width: 280px;">
-            <div class="card">
-                <div class="card-header fw-bold">@status.GetDisplayName()</div>
-                <div class="card-body kanban-column p-2"
-                     data-status="@((int)status)"
-                     style="min-height: 400px;">
-                    @foreach (var task in Model.Where(t => t.Status == status))
-                    {
-                        <div class="card mb-2 task-card" data-id="@task.Id" style="cursor: grab;">
-                            <div class="card-body p-2">
-                                <div class="mb-1">@task.Title</div>
-                                <div class="mb-2">
-                                    <a asp-controller="Projects" asp-action="Index"
-                                       class="badge text-decoration-none"
-                                       style="background-color: @ColorHelper.GetProjectColor(ViewBag.ProjectTag as string ?? ""); color: white; font-size: 0.7rem;">
-                                        @ViewBag.ProjectName
-                                    </a>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <a asp-controller="Tasks" asp-action="Details"
-                                       asp-route-projectId="@ViewBag.ProjectId"
-                                       asp-route-id="@task.Id"
-                                       class="text-muted fw-bold text-decoration-none"
-                                       style="font-size: 0.8rem;">
-                                        @task.TypeIcon @task.Tag
-                                    </a>
-                                    @if (task.AssigneeName != null)
-                                    {
-                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                                             style="width:28px; height:28px; font-size:0.7rem;"
-                                             title="@task.AssigneeName">
-                                            @task.AssigneeName.Substring(0, 1).ToUpper()
+    <div class="d-flex gap-3 overflow-auto pb-4 kanban-wrapper" style="min-height: calc(100vh - 200px);">
+        @foreach (var status in statuses)
+        {
+            <div class="kanban-column-container">
+                <div class="card border-0 bg-light shadow-none" style="border-radius: 12px;">
+                    <div class="card-header bg-transparent border-0 pt-3 pb-2 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold text-uppercase mb-0 text-secondary" style="letter-spacing: 0.5px; font-size: 0.7rem;">
+                            @status.GetDisplayName()
+                        </h6>
+                        @* Added 'status-counter' class here *@
+                        <span class="badge bg-white text-dark border rounded-pill shadow-sm small status-counter">
+                            @Model.Count(t => t.Status == status)
+                        </span>
+                    </div>
+
+                    <div class="card-body kanban-column p-2"
+                         data-status="@((int)status)"
+                         style="min-height: 150px;">
+
+                        @foreach (var task in Model.Where(t => t.Status == status))
+                        {
+                            <div class="card mb-2 task-card border-0 shadow-sm" data-id="@task.Id">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge rounded-pill"
+                                              style="background-color: @projectColor; font-size: 0.6rem; opacity: 0.85;">
+                                            @projectTag
+                                        </span>
+                                        <div class="user-avatar shadow-sm" title="@task.AssigneeName">
+                                            @if (!string.IsNullOrEmpty(task.AssigneeName))
+                                            {
+                                                <div class="bg-primary text-white">
+                                                    @task.AssigneeName.Substring(0, 1).ToUpper()
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light text-muted border">
+                                                    <i class="bi bi-person"></i>
+                                                </div>
+                                            }
                                         </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="rounded-circle border d-flex align-items-center justify-content-center"
-                                             style="width:28px; height:28px;">
-                                        </div>
-                                    }
+                                    </div>
+
+                                    <p class="mb-3 text-dark fw-medium small lh-sm">@task.Title</p>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <a asp-controller="Tasks" asp-action="Details"
+                                           asp-route-projectId="@ViewBag.ProjectId"
+                                           asp-route-id="@task.Id"
+                                           class="text-muted fw-bold text-decoration-none" style="font-size: 0.7rem;">
+                                            <i class="bi @task.TypeIcon me-1"></i> @task.Tag
+                                        </a>
+                                        <i class="bi bi-three-dots-vertical text-muted opacity-50"></i>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>
+
+<style>
+    .kanban-column-container {
+        flex-shrink: 0;
+        width: 320px;
+    }
+
+    .task-card {
+        cursor: grab;
+        transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        border-left: 3px solid transparent !important;
+    }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+            border-left: 3px solid var(--task-color) !important;
+        }
+
+    .user-avatar div {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .sortable-ghost {
+        opacity: 0.2;
+        filter: grayscale(1);
+    }
+
+    .btn-white {
+        background: #fff;
+    }
+</style>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
+        function updateCounters() {
+            document.querySelectorAll('.kanban-column-container').forEach(container => {
+                const count = container.querySelectorAll('.task-card').length;
+                const counter = container.querySelector('.status-counter');
+                if (counter) {
+                    counter.innerText = count;
+                }
+            });
+        }
+
         document.querySelectorAll('.kanban-column').forEach(column => {
             new Sortable(column, {
                 group: 'kanban',
-                animation: 150,
+                animation: 250,
+                ghostClass: 'sortable-ghost',
                 onEnd: async function (evt) {
+                    // Update counters immediately for smooth UI
+                    updateCounters();
+
                     const taskId = evt.item.dataset.id;
                     const newStatus = evt.to.dataset.status;
 
-                    await fetch(`/tasks/@ViewBag.ProjectId/${taskId}/status`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(parseInt(newStatus))
-                    });
+                    if (evt.from !== evt.to) {
+                        const url = `/tasks/@ViewBag.ProjectId/${taskId}/status`;
+
+                        try {
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(parseInt(newStatus))
+                            });
+
+                            if (!response.ok) {
+                                alert('Failed to update status. Please refresh.');
+                                location.reload();
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            location.reload();
+                        }
+                    }
                 }
             });
         });

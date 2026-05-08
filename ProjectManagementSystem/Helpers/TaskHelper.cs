@@ -1,17 +1,17 @@
 ﻿namespace ProjectManagementSystem.Helpers
 {
     using Constants;
-    using Enums;
+    using Enums.Task;
     using System.ComponentModel.DataAnnotations;
     using System.Reflection;
 
     public static class TaskHelper
     {
-        public static string GetTypeIcon(TaskType type) => type switch
+        public static string GetTypeIcon(Type type) => type switch
         {
-            TaskType.Bug => TaskConstants.Icons[TaskConstants.BugPrefix],
-            TaskType.Feature => TaskConstants.Icons[TaskConstants.FeaturePrefix],
-            TaskType.Task => TaskConstants.Icons[TaskConstants.TaskPrefix],
+            Type.Bug => TaskConstants.Icons[TaskConstants.BugPrefix],
+            Type.Feature => TaskConstants.Icons[TaskConstants.FeaturePrefix],
+            Type.Task => TaskConstants.Icons[TaskConstants.TaskPrefix],
             _ => ""
         };
 

@@ -1,11 +1,14 @@
-﻿namespace ProjectManagementSystem.ViewModels.Home
+﻿namespace ProjectManagementSystem.DTOs
 {
     using Enums;
+    using System;
 
     public class ActivityDto
     {
-        public string Message { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; }
-        public ActivityType Type { get; set; }
+        public required string Message { get; init; }
+
+        public required DateTime Timestamp { get; init; }
+
+        public required ActivityType Type { get; init; }
     }
 }

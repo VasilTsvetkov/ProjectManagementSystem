@@ -1,11 +1,18 @@
 ﻿namespace ProjectManagementSystem.ViewModels.TimeLogs
 {
+    using System;
+    using System.Collections.Generic;
+
     public class MonthlyMatrixViewModel
     {
-        public int ProjectId { get; set; }
-        public string ProjectName { get; set; } = null!;
-        public DateTime SelectedMonth { get; set; }
-        public List<DateTime> DaysInMonth { get; set; } = [];
-        public List<UserMatrixRowViewModel> Rows { get; set; } = [];
+        public int ProjectId { get; init; }
+
+        public required string ProjectName { get; init; }
+
+        public DateTime SelectedMonth { get; init; }
+
+        public IReadOnlyList<DateTime> DaysInMonth { get; init; } = [];
+
+        public IReadOnlyList<UserMatrixRowViewModel> Rows { get; init; } = [];
     }
 }

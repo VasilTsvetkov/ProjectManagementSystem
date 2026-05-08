@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.Services
 {
+    using Constants;
     using Enums;
     using Interfaces;
     using Microsoft.Extensions.Logging;
@@ -15,15 +16,15 @@
         private readonly IActivityService _activityService = activityService;
         private readonly ILogger<ProjectService> _logger = logger;
 
-        public async Task<IEnumerable<ProjectListViewModel>> GetAllProjectsAsync()
+        public async Task<IEnumerable<ProjectDisplayViewModel>> GetAllProjectsAsync()
         {
             var projects = await _projectRepository.GetAllAsync();
 
-            return projects.Select(p => new ProjectListViewModel
+            return projects.Select(p => new ProjectDisplayViewModel
             {
                 Id = p.Id,
                 Tag = p.Tag,
-                Name = p.Name,
+                Name = p.Name ?? MessageConstants.UntitledProject,
                 Description = p.Description,
                 CreatedAt = p.CreatedAt
             }).ToList();
@@ -40,12 +41,12 @@
 
             return new ProjectViewModel
             {
-                Name = project.Name,
+                Name = project.Name ?? MessageConstants.UntitledProject,
                 Description = project.Description
             };
         }
 
-        public async Task<ProjectDetailsViewModel?> GetProjectForDeleteAsync(int id)
+        public async Task<ProjectDisplayViewModel?> GetProjectForDeleteAsync(int id)
         {
             var project = await _projectRepository.GetByIdAsync(id);
 
@@ -54,10 +55,11 @@
                 return null;
             }
 
-            return new ProjectDetailsViewModel
+            return new ProjectDisplayViewModel
             {
                 Id = project.Id,
-                Name = project.Name,
+                Tag = project.Tag,
+                Name = project.Name ?? MessageConstants.UntitledProject,
                 Description = project.Description,
                 CreatedAt = project.CreatedAt
             };
@@ -65,9 +67,14 @@
 
         public async Task<bool> CreateProjectAsync(ProjectViewModel model, string creatorId)
         {
+            var projectName = string.IsNullOrWhiteSpace(model.Name)
+                ? MessageConstants.UntitledProject
+                : model.Name;
+
             var project = new Project
             {
-                Name = model.Name,
+                Name = projectName,
+                Tag = string.Empty,
                 Description = model.Description,
                 CreatorId = creatorId,
                 CreatedAt = DateTime.UtcNow
@@ -75,21 +82,32 @@
 
             await _projectRepository.AddAsync(project);
 
-            await _activityService.LogAsync(creatorId, $"Created project: {model.Name}", ActivityType.ProjectAction);
+            await _activityService.LogAsync(
+                creatorId,
+                string.Format(MessageConstants.ActivityCreatedProject, projectName),
+                ActivityType.ProjectAction);
 
-            _logger.LogInformation("Project {ProjectName} created by user {UserId}", model.Name, creatorId);
+            _logger.LogInformation("Project {ProjectName} created by user {UserId}", projectName, creatorId);
 
             return true;
         }
 
         public async Task<bool> UpdateProjectAsync(int id, ProjectViewModel model, string userId)
         {
-            var updated = await _projectRepository.UpdateProjectAsync(id, model.Name, model.Description);
+            var projectName = string.IsNullOrWhiteSpace(model.Name)
+                ? MessageConstants.UntitledProject
+                : model.Name;
+
+            var updated = await _projectRepository.UpdateProjectAsync(id, projectName, model.Description);
 
             if (updated)
             {
-                await _activityService.LogAsync(userId, $"Updated details for project: {model.Name}", ActivityType.ProjectAction);
-                _logger.LogInformation("Project {ProjectId} updated", id);
+                await _activityService.LogAsync(
+                    userId,
+                    string.Format(MessageConstants.ActivityUpdatedProject, projectName),
+                    ActivityType.ProjectAction);
+
+                _logger.LogInformation("Project {ProjectId} updated by user {UserId}", id, userId);
             }
 
             return updated;
@@ -98,14 +116,18 @@
         public async Task<bool> DeleteProjectAsync(int id, string userId)
         {
             var project = await _projectRepository.GetByIdAsync(id);
-            var projectName = project?.Name ?? "Unknown Project";
+            var projectName = project?.Name ?? MessageConstants.UnknownProject;
 
             var deleted = await _projectRepository.DeleteAsync(id);
 
             if (deleted)
             {
-                await _activityService.LogAsync(userId, $"Deleted project: {projectName}", ActivityType.ProjectAction);
-                _logger.LogInformation("Project {ProjectId} deleted", id);
+                await _activityService.LogAsync(
+                    userId,
+                    string.Format(MessageConstants.ActivityDeletedProject, projectName),
+                    ActivityType.ProjectAction);
+
+                _logger.LogInformation("Project {ProjectId} ({ProjectName}) deleted by user {UserId}", id, projectName, userId);
             }
 
             return deleted;

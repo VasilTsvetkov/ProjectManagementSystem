@@ -6,15 +6,24 @@
 
     public class DashboardViewModel
     {
-        public int Year { get; set; }
-        public int Month { get; set; }
-        public string? SelectedUserId { get; set; }
-        public MonthlyStatsDto Stats { get; set; } = new();
-        public List<ProjectTimeDto> ProjectBreakdown { get; set; } = [];
-        public List<UserTimeDto> UserBreakdown { get; set; } = [];
-        public List<SelectListItem> AvailableMonths { get; set; } = [];
-        public List<SelectListItem> AvailableYears { get; set; } = [];
-        public List<SelectListItem> AvailableUsers { get; set; } = [];
-        public bool CanViewAllUsers { get; set; }
+        public int Year { get; init; }
+
+        public int Month { get; init; }
+
+        public string? SelectedUserId { get; init; }
+
+        public required MonthlyStatsDto Stats { get; init; }
+
+        public required IReadOnlyList<ProjectTimeDto> ProjectBreakdown { get; init; }
+
+        public required IReadOnlyList<UserTimeDto> UserBreakdown { get; init; }
+
+        public required IReadOnlyList<SelectListItem> AvailableMonths { get; init; }
+
+        public required IReadOnlyList<SelectListItem> AvailableYears { get; init; }
+
+        public required IReadOnlyList<SelectListItem> AvailableUsers { get; init; }
+
+        public bool CanViewAllUsers { get; init; }
     }
 }

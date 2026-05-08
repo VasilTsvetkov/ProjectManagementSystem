@@ -4,29 +4,30 @@ namespace ProjectManagementSystem.Controllers
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using System.Security.Claims;
+    using System.Diagnostics;
+    using ViewModels.Home;
 
     [Authorize]
     public class HomeController(IHomeService homeService) : Controller
     {
-        private readonly IHomeService _homeService = homeService;
-
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var model = await _homeService.GetHomeIndexDataAsync(userId);
+            var model = await homeService.GetHomeIndexDataAsync(userId);
 
             return View(model);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
+        [AllowAnonymous]
+        [Route("Home/Error/{statusCode?}")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(int? statusCode = null)
         {
-            return View(new Models.ErrorViewModel { RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                StatusCode = statusCode
+            });
         }
     }
 }

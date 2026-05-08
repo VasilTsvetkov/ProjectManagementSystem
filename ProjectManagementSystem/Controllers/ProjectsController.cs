@@ -85,23 +85,12 @@
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet("{id}/delete")]
-        [Authorize(Roles = Roles.AdminOrManager)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var model = await _projectService.GetProjectForDeleteAsync(id);
-            if (model == null) return NotFound();
-
-            return View(model);
-        }
-
         [HttpPost("{id}/delete")]
         [Authorize(Roles = Roles.AdminOrManager)]
+        [ValidateAntiForgeryToken]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 

@@ -2,10 +2,14 @@
 {
     public class CommentListViewModel
     {
-        public int Id { get; set; }
-        public string Content { get; set; } = string.Empty;
-        public string AuthorName { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public bool CanEdit { get; set; }
+        public int Id { get; init; }
+
+        public required string Content { get; init; }
+
+        public required string AuthorName { get; init; }
+
+        public required DateTime CreatedAt { get; init; }
+
+        public bool CanEdit { get; init; }
     }
 }

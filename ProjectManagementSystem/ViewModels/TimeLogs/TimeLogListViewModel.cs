@@ -1,15 +1,22 @@
-﻿using ProjectManagementSystem.Helpers;
-
-namespace ProjectManagementSystem.ViewModels.TimeLogs
+﻿namespace ProjectManagementSystem.ViewModels.TimeLogs
 {
+    using Helpers;
+
     public class TimeLogListViewModel
     {
-        public int Id { get; set; }
-        public double Hours { get; set; }
-        public DateTime Date { get; set; }
-        public string? Description { get; set; }
-        public string UserName { get; set; } = string.Empty;
-        public bool CanEdit { get; set; }
+        public int Id { get; init; }
+
+        public double Hours { get; init; }
+
+        public DateTime Date { get; init; }
+
+        public string? Description { get; init; }
+
+        public required string UserName { get; init; }
+
+        public bool CanEdit { get; init; }
+
+        // Logic for the View to consume easily
         public string FormattedHours => TimeFormatter.Format(Hours);
     }
 }

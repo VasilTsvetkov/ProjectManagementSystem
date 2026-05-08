@@ -1,7 +1,7 @@
 ﻿namespace ProjectManagementSystem.Interfaces
 {
     using DTOs;
-    using Enums;
+    using Enums.Task;
     using Models;
 
     public interface ITaskRepository : IRepository<ProjectTask>
@@ -12,6 +12,6 @@
 
         Task<bool> UpdateTaskAsync(int id, UpdateTaskDto dto);
 
-        Task<bool> UpdateStatusAsync(int id, ProjectTaskStatus status);
+        Task<bool> UpdateStatusAsync(int id, Status status);
     }
 }

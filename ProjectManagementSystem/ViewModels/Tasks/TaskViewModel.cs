@@ -1,23 +1,20 @@
 ﻿namespace ProjectManagementSystem.ViewModels.Tasks
 {
-    using Enums;
+    using Enums.Task;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
+    using Type = Enums.Task.Type;
 
     public class TaskViewModel
     {
-        [Required]
-        public string Title { get; set; } = string.Empty;
+        public required string Title { get; set; }
 
-        [Required]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
 
-        [Required]
-        public TaskType Type { get; set; }
+        public required Type Type { get; set; }
 
-        [Required]
-        public TaskPriority Priority { get; set; }
+        public required Priority Priority { get; set; }
 
         public DateTime? Deadline { get; set; }
 

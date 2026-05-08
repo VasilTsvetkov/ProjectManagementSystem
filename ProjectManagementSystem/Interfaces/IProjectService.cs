@@ -4,11 +4,11 @@
 
     public interface IProjectService
     {
-        Task<IEnumerable<ProjectListViewModel>> GetAllProjectsAsync();
+        Task<IEnumerable<ProjectDisplayViewModel>> GetAllProjectsAsync();
 
         Task<ProjectViewModel?> GetProjectForEditAsync(int id);
 
-        Task<ProjectDetailsViewModel?> GetProjectForDeleteAsync(int id);
+        Task<ProjectDisplayViewModel?> GetProjectForDeleteAsync(int id);
 
         Task<bool> CreateProjectAsync(ProjectViewModel model, string createdByUserId);
 

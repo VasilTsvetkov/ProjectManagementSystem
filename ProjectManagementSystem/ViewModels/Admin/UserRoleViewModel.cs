@@ -2,10 +2,14 @@
 {
     public class UserRoleViewModel
     {
-        public string UserId { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty;
-        public string CurrentRole { get; set; } = string.Empty;
-        public bool IsAdmin { get; set; }
+        public required string UserId { get; init; }
+
+        public required string Email { get; init; }
+
+        public required string FullName { get; init; }
+
+        public required string CurrentRole { get; init; }
+
+        public bool IsAdmin { get; init; }
     }
 }

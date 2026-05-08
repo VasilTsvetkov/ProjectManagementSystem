@@ -1,19 +1,30 @@
 ﻿namespace ProjectManagementSystem.ViewModels.Tasks
 {
-    using Enums;
+    using Enums.Task;
     using Helpers;
+    using System;
+    using Type = Enums.Task.Type;
 
     public class TaskListViewModel
     {
-        public int Id { get; set; }
-        public int ProjectId { get; set; }
-        public string Tag { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public TaskType Type { get; set; }
-        public TaskPriority Priority { get; set; }
-        public ProjectTaskStatus Status { get; set; }
-        public DateTime? Deadline { get; set; }
-        public string AssigneeName { get; set; } = string.Empty;
+        public int Id { get; init; }
+
+        public int ProjectId { get; init; }
+
+        public required string Tag { get; init; }
+
+        public required string Title { get; init; }
+
+        public required Type Type { get; init; }
+
+        public required Priority Priority { get; init; }
+
+        public required Status Status { get; init; }
+
+        public DateTime? Deadline { get; init; }
+
+        public string? AssigneeName { get; init; }
+
         public string TypeIcon => TaskHelper.GetTypeIcon(Type);
     }
 }

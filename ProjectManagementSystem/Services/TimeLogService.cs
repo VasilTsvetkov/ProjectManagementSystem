@@ -30,7 +30,7 @@
 
             if (userExistingHours + newHours > TimeConfig.WorkingHoursPerDay)
             {
-                _logger.LogWarning("User {UserId} attempted to log {Total} hours on {Date}, exceeding daily limit.", userId, userExistingHours + newHours, model.Date.ToShortDateString());
+                _logger.LogWarning("User {UserId} attempted to log {TotalHours} hours on {Date}, exceeding daily limit.", userId, userExistingHours + newHours, model.Date.ToShortDateString());
                 return false;
             }
 
@@ -45,11 +45,13 @@
 
             await _timeLogRepository.AddAsync(timeLog);
 
-            var task = await _taskRepository.GetByIdAsync(model.TaskId);
-            string taskTag = task?.Tag ?? "Task";
-
+            string taskTag = await GetTaskTagAsync(model.TaskId);
             string formattedTime = TimeFormatter.Format(newHours);
-            await _activityService.LogAsync(userId, $"Logged {formattedTime} on {taskTag}", ActivityType.TimeLogAction);
+
+            await _activityService.LogAsync(
+                userId,
+                string.Format(MessageConstants.ActivityLoggedTime, formattedTime, taskTag),
+                ActivityType.TimeLogAction);
 
             _logger.LogInformation("Time log created for Task {TaskId} by User {UserId}", model.TaskId, userId);
 
@@ -66,16 +68,18 @@
             }
 
             var taskId = timeLog.TaskId;
-            var task = await _taskRepository.GetByIdAsync(taskId);
-            string taskTag = task?.Tag ?? "Task";
-
+            string taskTag = await GetTaskTagAsync(taskId);
             string formattedTime = TimeFormatter.Format(timeLog.Hours);
 
             var deleted = await _timeLogRepository.DeleteAsync(id);
 
             if (deleted)
             {
-                await _activityService.LogAsync(userId, $"Deleted {formattedTime} log from {taskTag}", ActivityType.TimeLogAction);
+                await _activityService.LogAsync(
+                    userId,
+                    string.Format(MessageConstants.ActivityDeletedTimeLog, formattedTime, taskTag),
+                    ActivityType.TimeLogAction);
+
                 _logger.LogInformation("Time log {TimeLogId} deleted by User {UserId}", id, userId);
                 return (true, taskId);
             }
@@ -97,7 +101,7 @@
             var model = new MonthlyMatrixViewModel
             {
                 ProjectId = projectId,
-                ProjectName = project.Name,
+                ProjectName = project.Name ?? MessageConstants.UntitledProject,
                 SelectedMonth = startDate,
                 DaysInMonth = Enumerable.Range(0, daysCount)
                                         .Select(offset => startDate.AddDays(offset))
@@ -105,25 +109,41 @@
             };
 
             var userGroups = logs.GroupBy(l => l.UserId);
+            var rowsList = new List<UserMatrixRowViewModel>();
 
             foreach (var group in userGroups)
             {
                 var firstLog = group.First();
-                var row = new UserMatrixRowViewModel
-                {
-                    UserId = group.Key,
-                    FullName = $"{firstLog.User.FirstName} {firstLog.User.LastName}"
-                };
+                var workingHours = new Dictionary<int, double>();
 
                 for (int i = 1; i <= daysCount; i++)
                 {
-                    row.DailyHours[i] = group.Where(l => l.Date.Day == i).Sum(l => l.Hours);
+                    var sum = group.Where(l => l.Date.Day == i).Sum(l => l.Hours);
+                    if (sum > 0)
+                    {
+                        workingHours[i] = sum;
+                    }
                 }
 
-                model.Rows.Add(row);
+                var row = new UserMatrixRowViewModel
+                {
+                    UserId = group.Key,
+                    FullName = firstLog.User.FullName,
+                    DailyHours = workingHours
+                };
+
+                rowsList.Add(row);
             }
 
             return model;
+        }
+
+        private async Task<string> GetTaskTagAsync(int taskId)
+        {
+            var task = await _taskRepository.GetByIdAsync(taskId);
+            if (task == null) return MessageConstants.MissingTaskIdentifier;
+
+            return !string.IsNullOrWhiteSpace(task.Tag) ? task.Tag : MessageConstants.UntitledTask;
         }
     }
 }

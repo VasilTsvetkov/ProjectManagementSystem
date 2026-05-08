@@ -2,10 +2,14 @@
 {
     public class UserTimeDto
     {
-        public string UserId { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
-        public double TotalHours { get; set; }
-        public int ProjectCount { get; set; }
-        public int TaskCount { get; set; }
+        public required string UserId { get; init; }
+
+        public required string UserName { get; init; }
+
+        public required double TotalHours { get; init; }
+
+        public required int ProjectCount { get; init; }
+
+        public required int TaskCount { get; init; }
     }
 }

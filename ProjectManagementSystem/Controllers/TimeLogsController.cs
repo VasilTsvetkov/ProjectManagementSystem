@@ -40,7 +40,7 @@
         public async Task<IActionResult> Create(TimeLogViewModel model)
         {
             if (!ModelState.IsValid)
-                return RedirectToAction("Details", "Tasks", new { projectId = model.ProjectId, id = model.TaskId });
+                return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
 
             var userId = _userManager.GetUserId(User);
 
@@ -53,10 +53,10 @@
 
             if (!success)
             {
-                TempData["Error"] = $"Daily limit reached. You cannot log more than {TimeConfig.WorkingHoursPerDay} hours per day.";
+                TempData[NotificationKeys.Error] = $"Daily limit reached. You cannot log more than {TimeConfig.WorkingHoursPerDay} hours per day.";
             }
 
-            return RedirectToAction("Details", "Tasks", new { projectId = model.ProjectId, id = model.TaskId });
+            return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
         }
 
         [HttpPost("{id}/delete")]
@@ -76,7 +76,7 @@
 
             if (result == null) return NotFound();
 
-            return RedirectToAction("Details", "Tasks", new { projectId, id = result.Value.TaskId });
+            return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId, id = result.Value.TaskId });
         }
     }
 }

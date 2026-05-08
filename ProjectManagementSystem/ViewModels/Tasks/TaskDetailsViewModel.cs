@@ -1,28 +1,45 @@
 ﻿namespace ProjectManagementSystem.ViewModels.Tasks
 {
     using Comments;
-    using Enums;
+    using Enums.Task;
     using Helpers;
+    using System;
     using System.Collections.Generic;
     using TimeLogs;
+    using Type = Enums.Task.Type;
 
     public class TaskDetailsViewModel
     {
-        public int Id { get; set; }
-        public string Tag { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public TaskType Type { get; set; }
-        public TaskPriority Priority { get; set; }
-        public ProjectTaskStatus Status { get; set; }
-        public DateTime? Deadline { get; set; }
-        public string AssigneeName { get; set; } = string.Empty;
-        public string ReporterName { get; set; } = string.Empty;
-        public int ProjectId { get; set; }
-        public double TotalHours { get; set; }
-        public IEnumerable<CommentListViewModel> Comments { get; set; } = [];
-        public IEnumerable<TimeLogListViewModel> TimeLogs { get; set; } = [];
+        public int Id { get; init; }
+
+        public required string Tag { get; init; }
+
+        public required string Title { get; init; }
+
+        public string? Description { get; init; }
+
+        public required Type Type { get; init; }
+
+        public required Priority Priority { get; init; }
+
+        public required Status Status { get; init; }
+
+        public DateTime? Deadline { get; init; }
+
+        public required string AssigneeName { get; init; }
+
+        public required string ReporterName { get; init; }
+
+        public int ProjectId { get; init; }
+
+        public double TotalHours { get; init; }
+
+        public IReadOnlyList<CommentListViewModel> Comments { get; init; } = [];
+
+        public IReadOnlyList<TimeLogListViewModel> TimeLogs { get; init; } = [];
+
         public string FormattedTotalHours => TimeFormatter.Format(TotalHours);
+
         public string TypeIcon => TaskHelper.GetTypeIcon(Type);
     }
 }

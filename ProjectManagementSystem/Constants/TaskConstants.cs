@@ -6,6 +6,9 @@
         public const string TaskPrefix = "TSK";
         public const string FeaturePrefix = "FEAT";
 
+        public const string Controller = "Tasks";
+        public const string DetailsAction = "Details";
+
         public static readonly string[] Colors =
         [
             "#3B82F6",

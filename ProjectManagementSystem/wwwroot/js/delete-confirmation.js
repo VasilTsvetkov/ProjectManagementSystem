@@ -1,10 +1,14 @@
 ﻿function confirmDelete(url, itemName, itemType) {
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const modalElement = document.getElementById('deleteModal');
     const form = document.getElementById('deleteForm');
     const message = document.getElementById('deleteModalMessage');
 
-    form.action = url;
-    message.textContent = `Are you sure you want to delete ${itemType} "${itemName}"?`;
+    if (modalElement && form && message) {
+        form.action = url;
 
-    modal.show();
+        message.innerHTML = `Are you sure you want to delete ${itemType} <strong>"${itemName}"</strong>?`;
+
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
 }

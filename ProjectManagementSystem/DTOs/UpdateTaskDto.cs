@@ -1,15 +1,23 @@
 ﻿namespace ProjectManagementSystem.DTOs
 {
-    using Enums;
+    using System;
+    using Enums.Task;
+    using Type = Enums.Task.Type;
 
     public class UpdateTaskDto
     {
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public TaskType Type { get; set; }
-        public TaskPriority Priority { get; set; }
-        public ProjectTaskStatus Status { get; set; }
-        public DateTime? Deadline { get; set; }
-        public string? AssigneeId { get; set; }
+        public required string Title { get; init; }
+
+        public string? Description { get; init; }
+
+        public required Type Type { get; init; }
+
+        public required Priority Priority { get; init; }
+
+        public required Status Status { get; init; }
+
+        public DateTime? Deadline { get; init; }
+
+        public string? AssigneeId { get; init; }
     }
 }

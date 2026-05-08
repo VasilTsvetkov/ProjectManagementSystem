@@ -1,70 +1,107 @@
-﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Tasks.TaskListViewModel>
-@using ProjectManagementSystem.Helpers
-@using ProjectManagementSystem.Constants
+﻿@model IEnumerable<TaskListViewModel>
 
 @{
     ViewData["Title"] = "Tasks";
+    var projectId = ViewBag.ProjectId;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>@ViewBag.ProjectName</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <a asp-action="Board" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-outline-primary">Board View</a>
+        <h2 class="h3 mb-0 fw-bold text-dark">@ViewBag.ProjectName</h2>
+        <p class="text-muted small mb-0">Project Tasks</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Board" asp-route-projectId="@projectId" class="btn btn-white border shadow-sm px-3">
+            <i class="bi bi-kanban me-2"></i>Board View
+        </a>
         @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Manager))
         {
-            <a asp-action="Create" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-primary">+ New Task</a>
+            <a asp-action="Create" asp-route-projectId="@projectId" class="btn btn-primary shadow-sm px-3">
+                <i class="bi bi-plus-lg me-1"></i> New Task
+            </a>
         }
     </div>
 </div>
 
 @if (!Model.Any())
 {
-    <p class="text-muted">No tasks yet. Create your first one!</p>
+    <div class="card border-0 shadow-sm text-center py-5">
+        <div class="card-body">
+            <i class="bi bi-clipboard-check text-muted display-4 mb-3 d-block"></i>
+            <p class="text-muted">No tasks found for this project. Ready to start?</p>
+            @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Manager))
+            {
+                <a asp-action="Create" asp-route-projectId="@projectId" class="btn btn-primary btn-sm">Create First Task</a>
+            }
+        </div>
+    </div>
 }
 else
 {
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Tag</th>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Deadline</th>
-                <th>Assignee</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var task in Model)
-            {
-                <tr>
-                    <td>
-                        <a asp-action="Details" asp-route-projectId="@ViewBag.ProjectId" asp-route-id="@task.Id"
-                           class="text-decoration-none">
-                            <partial name="_TaskTag" model="task" />
-                        </a>
-                    </td>
-                    <td>@task.Title</td>
-                    <td>@task.Type</td>
-                    <td>@task.Priority</td>
-                    <td>@task.Status.GetDisplayName()</td>
-                    <td>@(task.Deadline?.ToString("dd MMM yyyy") ?? "-")</td>
-                    <td>@(task.AssigneeName ?? "Unassigned")</td>
-                    <td>
-                        @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Manager))
-                        {
-                            <a asp-action="Edit" asp-route-projectId="@ViewBag.ProjectId" asp-route-id="@task.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                            <button type="button"
-                                    class="btn btn-sm btn-outline-danger"
-                                    onclick="confirmDelete('@Url.Action("DeleteConfirmed", "Tasks", new { projectId = ViewBag.ProjectId, id = task.Id })', '@task.Title', 'task')">
-                                Delete
-                            </button>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Tag</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Deadline</th>
+                        <th>Assignee</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var task in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <a asp-action="Details" asp-route-projectId="@projectId" asp-route-id="@task.Id" class="text-decoration-none">
+                                    <partial name="_TaskTag" model="task" />
+                                </a>
+                            </td>
+                            <td class="fw-medium text-dark">@task.Title</td>
+                            <td>
+                                <span class="small"><i class="bi @task.TypeIcon me-1"></i> @task.Type</span>
+                            </td>
+                            <td>@task.Priority</td>
+                            <td>
+                                <span class="badge rounded-pill bg-light text-dark border">
+                                    @task.Status.GetDisplayName()
+                                </span>
+                            </td>
+                            <td class="small text-muted">
+                                @(task.Deadline?.ToString(TimeConfig.DateDisplayFormat) ?? "-")
+                            </td>
+                            <td>
+                                <span class="small fw-medium">@(task.AssigneeName ?? "Unassigned")</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Manager))
+                                    {
+                                        <a asp-action="Edit" asp-route-projectId="@projectId" asp-route-id="@task.Id"
+                                           class="btn btn-sm btn-white border border-end-0">
+                                            <i class="bi bi-pencil text-secondary"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-white border"
+                                                onclick="confirmDelete('@Url.Action("Delete", "Tasks", new { projectId = projectId, id = task.Id })', '@task.Tag')">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_DeleteConfirmModal" />
 }

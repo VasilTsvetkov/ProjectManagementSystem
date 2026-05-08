@@ -1,40 +1,51 @@
 ﻿namespace ProjectManagementSystem.Models
 {
     using Constants;
-    using Enums;
+    using Enums.Task;
 
     public class ProjectTask
     {
-        public ProjectTask()
-        {
-            Comments = [];
-            TimeLogs = [];
-        }
-
         public int Id { get; set; }
-        public int TaskNumber { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public TaskType Type { get; set; }
-        public TaskPriority Priority { get; set; }
-        public ProjectTaskStatus Status { get; set; }
+
+        public int Number { get; set; }
+
+        public required string Title { get; set; }
+
+        public string? Description { get; set; }
+
+        public required Type Type { get; set; }
+
+        public required Priority Priority { get; set; }
+
+        public required Status Status { get; set; }
+
         public DateTime? Deadline { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public int ProjectId { get; set; }
-        public Project Project { get; set; } = null!;
+
+        public required DateTime CreatedAt { get; set; }
+
+        public required int ProjectId { get; set; }
+
+        public virtual Project Project { get; set; } = null!;
+
         public string? AssigneeId { get; set; }
-        public ApplicationUser? Assignee { get; set; }
-        public string ReporterId { get; set; } = string.Empty;
-        public ApplicationUser Reporter { get; set; } = null!;
-        public ICollection<Comment> Comments { get; set; }
-        public ICollection<TimeLog> TimeLogs { get; set; }
-        public string Tag => $"{GetPrefix()}-{TaskNumber}";
+
+        public virtual ApplicationUser? Assignee { get; set; }
+
+        public required string ReporterId { get; set; }
+
+        public virtual ApplicationUser Reporter { get; set; } = null!;
+
+        public virtual ICollection<Comment> Comments { get; set; } = [];
+
+        public virtual ICollection<TimeLog> TimeLogs { get; set; } = [];
+
+        public string Tag => $"{GetPrefix()}-{Number}";
 
         private string GetPrefix() => Type switch
         {
-            TaskType.Bug => TaskConstants.BugPrefix,
-            TaskType.Feature => TaskConstants.FeaturePrefix,
-            TaskType.Task => TaskConstants.TaskPrefix,
+            Type.Bug => TaskConstants.BugPrefix,
+            Type.Feature => TaskConstants.FeaturePrefix,
+            Type.Task => TaskConstants.TaskPrefix,
             _ => TaskConstants.TaskPrefix
         };
     }

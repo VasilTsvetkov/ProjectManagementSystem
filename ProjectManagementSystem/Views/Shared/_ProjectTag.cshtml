@@ -1,9 +1,13 @@
 ﻿@model string
 
-@using ProjectManagementSystem.Helpers
-
 @{
     var color = ColorHelper.GetProjectColor(Model);
 }
 
-<span class="badge" style="background-color: @color">@Model</span>
+@if (!string.IsNullOrEmpty(Model))
+{
+    <span class="badge rounded-pill shadow-sm"
+          style="background-color: @color; min-width: 45px; letter-spacing: 0.5px;">
+        @Model.ToUpper()
+    </span>
+}

@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.Extensions
 {
+    using Constants;
     using Serilog;
 
     public static class ApplicationBuilderExtensions
@@ -15,7 +16,7 @@
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler(RouteConstants.ErrorPath);
                 app.UseHsts();
             }
 

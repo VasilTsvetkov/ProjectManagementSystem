@@ -34,7 +34,7 @@
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdateProjectAsync(int id, string name, string description)
+        public async Task<bool> UpdateProjectAsync(int id, string name, string? description)
         {
             var existing = await _context.Projects.FindAsync(id);
             if (existing == null) return false;

@@ -1,141 +1,256 @@
-﻿@model ProjectManagementSystem.ViewModels.Tasks.TaskDetailsViewModel
-@using ProjectManagementSystem.Helpers
+﻿@model TaskDetailsViewModel
 
 @{
     ViewData["Title"] = Model.Tag;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>
-        <partial name="_TaskTag" model="Model" /> - @Model.Title
-    </h2>
-    <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-outline-secondary">Back to Tasks</a>
-</div>
-
-<dl class="row">
-    <dt class="col-sm-2">Description</dt>
-    <dd class="col-sm-10">@Model.Description</dd>
-    <dt class="col-sm-2">Type</dt>
-    <dd class="col-sm-10">@Model.Type</dd>
-    <dt class="col-sm-2">Priority</dt>
-    <dd class="col-sm-10">@Model.Priority</dd>
-    <dt class="col-sm-2">Status</dt>
-    <dd class="col-sm-10">@Model.Status.GetDisplayName()</dd>
-    <dt class="col-sm-2">Deadline</dt>
-    <dd class="col-sm-10">@(Model.Deadline?.ToString("dd MMM yyyy") ?? "-")</dd>
-    <dt class="col-sm-2">Reporter</dt>
-    <dd class="col-sm-10">@Model.ReporterName</dd>
-    <dt class="col-sm-2">Assignee</dt>
-    <dd class="col-sm-10">@(Model.AssigneeName ?? "Unassigned")</dd>
-</dl>
-
-<hr />
-
-<h4>Time Logs <small class="text-muted fs-6">Total: @Model.FormattedTotalHours</small></h4>
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong><i class="bi bi-exclamation-triangle-fill me-2"></i>Error:</strong> @TempData["Error"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-<form asp-controller="TimeLogs" asp-action="Create" method="post" class="mb-4">
-    <input type="hidden" name="TaskId" value="@Model.Id" />
-    <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
-    <div class="row g-2 align-items-end">
-        <div class="col-auto">
-            <label class="form-label">Days</label>
-            <input type="number" name="Days" min="0" max="99" value="0" class="form-control" style="width:80px" />
-        </div>
-        <div class="col-auto">
-            <label class="form-label">Hours</label>
-            <input type="number" name="Hours" min="0" max="23" value="0" class="form-control" style="width:80px" />
-        </div>
-        <div class="col-auto">
-            <label class="form-label">Minutes</label>
-            <input type="number" name="Minutes" min="0" max="59" value="0" class="form-control" style="width:80px" />
-        </div>
-        <div class="col-auto">
-            <label class="form-label">Date</label>
-            <input type="date" name="Date" value="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")" class="form-control" />
-        </div>
-        <div class="col">
-            <label class="form-label">Description</label>
-            <input type="text" name="Description" class="form-control" placeholder="Optional..." />
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Log Time</button>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Index" class="text-decoration-none">Projects</a></li>
+                <li class="breadcrumb-item"><a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="text-decoration-none">Tasks</a></li>
+                <li class="breadcrumb-item active">@Model.Tag</li>
+            </ol>
+        </nav>
+        <div class="btn-group shadow-sm">
+            <a asp-action="Edit" asp-route-projectId="@Model.ProjectId" asp-route-id="@Model.Id" class="btn btn-white border btn-sm px-3">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+            <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-primary btn-sm px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
         </div>
     </div>
-</form>
 
-@if (!Model.TimeLogs.Any())
-{
-    <p class="text-muted">No time logged yet.</p>
-}
-else
-{
-    @foreach (var log in Model.TimeLogs)
-    {
-        <div class="card mb-2">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>@log.FormattedHours</strong> - @log.Date.ToString("dd MMM yyyy")
-                    @if (!string.IsNullOrEmpty(log.Description))
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <partial name="_TaskTag" model="Model" />
+                        <h2 class="fw-bold mt-2">@Model.Title</h2>
+                    </div>
+
+                    <h6 class="text-uppercase fw-bold text-muted small mb-2">Description</h6>
+                    <p class="text-dark lead fs-6">@Model.Description</p>
+
+                    <hr class="my-4" />
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0 text-dark">Time Logs</h5>
+                        <span class="badge bg-light text-dark border fw-medium px-3 py-2">Total: @Model.FormattedTotalHours</span>
+                    </div>
+
+                    @if (TempData[NotificationKeys.Error] != null)
                     {
-                        <span class="text-muted"> - @log.Description</span>
+                        <div class="alert alert-danger border-0 shadow-sm alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>@TempData[NotificationKeys.Error]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     }
-                    <br />
-                    <small class="text-muted">@log.UserName</small>
-                </div>
-                @if (log.CanEdit)
-                {
-                    <form asp-controller="TimeLogs" asp-action="Delete" asp-route-id="@log.Id" asp-route-projectId="@Model.ProjectId" method="post">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                    </form>
-                }
-            </div>
-        </div>
-    }
-}
 
-<hr />
-
-<h4>Comments</h4>
-
-<form asp-controller="Comments" asp-action="Create" method="post" class="mb-4">
-    <input type="hidden" name="TaskId" value="@Model.Id" />
-    <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
-    <div class="mb-3">
-        <textarea name="Content" class="form-control" rows="3" placeholder="Add a comment..."></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Add Comment</button>
-</form>
-
-@if (!Model.Comments.Any())
-{
-    <p class="text-muted">No comments yet.</p>
-}
-else
-{
-    @foreach (var comment in Model.Comments)
-    {
-        <div class="card mb-2">
-            <div class="card-body">
-                <p>@comment.Content</p>
-                <small class="text-muted">@comment.AuthorName - @comment.CreatedAt.ToString("dd MMM yyyy HH:mm")</small>
-                @if (comment.CanEdit)
-                {
-                    <div class="mt-2">
-                        <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <form asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.Id" asp-route-projectId="@Model.ProjectId" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    <div class="bg-light rounded p-3 mb-4 border border-dashed">
+                        <form asp-controller="TimeLogs" asp-action="Create" method="post">
+                            <input type="hidden" name="TaskId" value="@Model.Id" />
+                            <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-bold text-muted">Days</label>
+                                    <input type="number" name="Days" min="0" max="99" value="0" class="form-control form-control-sm" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-bold text-muted">Hours</label>
+                                    <input type="number" name="Hours" min="0" max="23" value="0" class="form-control form-control-sm" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-bold text-muted">Min</label>
+                                    <input type="number" name="Minutes" min="0" max="59" value="0" class="form-control form-control-sm" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold text-muted">Date</label>
+                                    <input type="date" name="Date" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-sm btn-primary w-100 shadow-sm">
+                                        <i class="bi bi-plus-lg me-1"></i>Log Time
+                                    </button>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <input type="text" name="Description" class="form-control form-control-sm" placeholder="What did you work on? (Optional)" maxlength="200" />
+                                </div>
+                            </div>
                         </form>
                     </div>
-                }
+
+                    @if (!Model.TimeLogs.Any())
+                    {
+                        <div class="text-center py-4 opacity-50">
+                            <i class="bi bi-clock-history fs-2"></i>
+                            <p class="small mt-1">No time logs recorded.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush border-top">
+                            @foreach (var log in Model.TimeLogs)
+                            {
+                                <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-bold text-primary">@log.FormattedHours</span>
+                                            <span class="text-muted small">•</span>
+                                            <span class="small fw-medium text-dark">@log.Date.ToString(TimeConfig.DateDisplayFormat)</span>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(log.Description))
+                                        {
+                                            <p class="mb-0 small text-secondary">@log.Description</p>
+                                        }
+                                        <small class="text-muted">Logged by @log.UserName</small>
+                                    </div>
+                                    @if (log.CanEdit)
+                                    {
+                                        @* UPDATED: Added 3rd parameter 'time log' *@
+                                        <button type="button" class="btn btn-link text-danger p-0 opacity-50 hover-opacity-100"
+                                                onclick="confirmDelete('@Url.Action("Delete", "TimeLogs", new { id = log.Id, projectId = Model.ProjectId })', '@log.FormattedHours', 'time log')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4 text-dark">Comments</h5>
+
+                    <form asp-controller="Comments" asp-action="Create" method="post" class="mb-4">
+                        <input type="hidden" name="TaskId" value="@Model.Id" />
+                        <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
+                        <div class="mb-2">
+                            <textarea name="Content" class="form-control bg-light border-0" rows="3" placeholder="Write a comment..." required></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary btn-sm px-4 shadow-sm">Post Comment</button>
+                        </div>
+                    </form>
+
+                    <div class="comment-timeline">
+                        @foreach (var comment in Model.Comments)
+                        {
+                            <div class="d-flex gap-3 mb-4">
+                                <div class="avatar-sm bg-secondary text-white rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 38px; height: 38px;">
+                                    @comment.AuthorName.Substring(0, 1).ToUpper()
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="bg-light rounded p-3 position-relative">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="fw-bold small text-dark">@comment.AuthorName</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">@comment.CreatedAt.ToString(TimeConfig.DateTimeDisplayFormat)</span>
+                                        </div>
+                                        <p class="mb-0 small text-dark">@comment.Content</p>
+                                    </div>
+                                    @if (comment.CanEdit)
+                                    {
+                                        <div class="mt-1 ps-2">
+                                            <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="text-muted small text-decoration-none me-2 hover-text-primary">Edit</a>
+                                            @* UPDATED: Added 3rd parameter 'comment' *@
+                                            <button type="button" class="btn btn-link p-0 text-danger small text-decoration-none"
+                                                    onclick="confirmDelete('@Url.Action("Delete", "Comments", new { id = comment.Id, projectId = Model.ProjectId })', 'your comment', 'comment')">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 2rem;">
+                <div class="card-body p-4">
+                    <h6 class="text-uppercase fw-bold text-muted small mb-4" style="letter-spacing: 1px;">Task Details</h6>
+
+                    <div class="mb-4">
+                        <label class="text-muted small d-block mb-2 fw-bold text-uppercase">Status</label>
+                        <span class="badge bg-primary rounded-pill w-100 py-2 fs-6 shadow-sm">@Model.Status.GetDisplayName()</span>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="text-muted small d-block mb-1 fw-bold text-uppercase">Type</label>
+                            <div class="fw-bold text-dark text-truncate">
+                                <i class="bi bi-tag-fill text-muted me-1"></i>@Model.Type
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="text-muted small d-block mb-1 fw-bold text-uppercase">Priority</label>
+                            <div class="fw-bold text-dark">
+                                <i class="bi bi-flag-fill text-muted me-1"></i>@Model.Priority
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small d-block mb-1 fw-bold text-uppercase">Deadline</label>
+                        <div class="fw-bold @(Model.Deadline < DateTime.UtcNow ? "text-danger" : "text-dark")">
+                            <i class="bi bi-calendar-x me-1"></i>@(Model.Deadline?.ToString(TimeConfig.DateDisplayFormat) ?? "-")
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="mb-3">
+                        <label class="text-muted small d-block mb-2 fw-bold text-uppercase">Assignee</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-light border rounded-circle p-1">
+                                <i class="bi bi-person fs-5 text-muted"></i>
+                            </div>
+                            <span class="fw-bold text-dark">@(Model.AssigneeName ?? MessageConstants.Unassigned)</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-muted small d-block mb-2 fw-bold text-uppercase">Reporter</label>
+                        <div class="d-flex align-items-center gap-2 opacity-75">
+                            <i class="bi bi-megaphone small"></i>
+                            <span class="small text-dark">@Model.ReporterName</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-white {
+        background: #fff;
     }
-}
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .avatar-sm {
+        font-size: 0.8rem;
+    }
+
+    .hover-opacity-100:hover {
+        opacity: 1 !important;
+    }
+
+    .hover-text-primary:hover {
+        color: #0d6efd !important;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+    }
+</style>

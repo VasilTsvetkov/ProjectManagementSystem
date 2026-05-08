@@ -5,7 +5,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: projectmanagementsystem-db
     environment:
-      SA_PASSWORD: "YourStrong@Passw0rd"
+      SA_PASSWORD: "${DB_PASSWORD}"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"

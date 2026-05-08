@@ -1,8 +1,8 @@
-﻿namespace ProjectManagementSystem.Enums
+﻿namespace ProjectManagementSystem.Enums.Task
 {
     using System.ComponentModel.DataAnnotations;
 
-    public enum ProjectTaskStatus
+    public enum Status
     {
         [Display(Name = "To Do")]
         ToDo,

@@ -1,6 +1,6 @@
 ﻿namespace ProjectManagementSystem.Interfaces
 {
-    using Enums;
+    using Enums.Task;
     using ViewModels.Tasks;
 
     public interface ITaskService
@@ -23,6 +23,6 @@
 
         Task<bool> DeleteTaskAsync(int id, string userId);
 
-        Task<bool> UpdateTaskStatusAsync(int id, ProjectTaskStatus status, string userId);
+        Task<bool> UpdateTaskStatusAsync(int id, Status status, string userId);
     }
 }

@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Identity;
     using Models;
     using ViewModels.Admin;
+    using Microsoft.Extensions.Logging;
 
     public class AdminService(UserManager<ApplicationUser> userManager, ILogger<AdminService> logger) : IAdminService
     {
@@ -24,7 +25,7 @@
                 userViewModels.Add(new UserRoleViewModel
                 {
                     UserId = user.Id,
-                    Email = user.Email ?? "No Email Provided",
+                    Email = user.Email ?? MessageConstants.NoEmailProvided,
                     FullName = user.FullName,
                     CurrentRole = currentRole,
                     IsAdmin = currentRole == Roles.Admin
@@ -40,7 +41,7 @@
             if (user == null)
             {
                 _logger.LogWarning("Role change failed: User {UserId} not found", userId);
-                return (false, "User not found");
+                return (false, MessageConstants.UserNotFound);
             }
 
             var currentRoles = await _userManager.GetRolesAsync(user);
@@ -49,7 +50,7 @@
             if (currentRole == Roles.Admin)
             {
                 _logger.LogWarning("Security Alert: Unauthorized attempt to change Admin role for {Email}", user.Email);
-                return (false, "Cannot change Admin role.");
+                return (false, MessageConstants.CannotChangeAdminRole);
             }
 
             if (currentRole != null)
@@ -61,11 +62,11 @@
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("Role changed: {Email} updated from {OldRole} to {NewRole}", user.Email, currentRole, newRole);
-                return (true, $"Role changed to {newRole} for {user.Email}");
+                _logger.LogInformation("Role changed: {FullName} updated from {OldRole} to {NewRole}", user.FullName, currentRole, newRole);
+                return (true, string.Format(MessageConstants.RoleChangedSuccessfully, newRole, user.FullName));
             }
 
-            return (false, "Failed to update role");
+            return (false, MessageConstants.RoleUpdateFailed);
         }
     }
 }

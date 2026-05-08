@@ -3,12 +3,19 @@
     public class TimeLog
     {
         public int Id { get; set; }
-        public double Hours { get; set; }
-        public DateTime Date { get; set; }
+
+        public required double Hours { get; set; }
+
+        public required DateTime Date { get; set; }
+
         public string? Description { get; set; }
-        public int TaskId { get; set; }
-        public ProjectTask Task { get; set; } = null!;
-        public string UserId { get; set; } = string.Empty;
-        public ApplicationUser User { get; set; } = null!;
+
+        public required int TaskId { get; set; }
+
+        public virtual ProjectTask Task { get; set; } = null!;
+
+        public required string UserId { get; set; }
+
+        public virtual ApplicationUser User { get; set; } = null!;
     }
 }

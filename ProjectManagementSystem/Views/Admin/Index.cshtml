@@ -1,77 +1,98 @@
-﻿@model IEnumerable<ProjectManagementSystem.ViewModels.Admin.UserRoleViewModel>
-@using ProjectManagementSystem.Constants
-@using ProjectManagementSystem.Enums
-@using ProjectManagementSystem.Helpers
+﻿@model IEnumerable<UserRoleViewModel>
 
 @{
     ViewData["Title"] = "User Management";
 }
 
 <div class="container mt-4">
-    <h2>User Management</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-people-fill me-2"></i>User Management</h2>
+        <span class="badge bg-secondary">Total Users: @Model.Count()</span>
+    </div>
 
-    @if (TempData["Success"] != null)
+    @if (TempData[NotificationKeys.Success] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData[NotificationKeys.Success]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    @if (TempData["Error"] != null)
+    @if (TempData[NotificationKeys.Error] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData[NotificationKeys.Error]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <table class="table table-hover mt-3">
-        <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Current Role</th>
-                <th>Change Role</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
-                <tr>
-                    <td>@user.FullName</td>
-                    <td>@user.Email</td>
-                    <td>
-                        @if (user.IsAdmin)
-                        {
-                            <span class="badge bg-danger">@user.CurrentRole</span>
-                        }
-                        else if (user.CurrentRole == Roles.Manager)
-                        {
-                            <span class="badge bg-warning">@user.CurrentRole</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">@user.CurrentRole</span>
-                        }
-                    </td>
-                    <td>
-                        @if (user.IsAdmin)
-                        {
-                            <span class="text-muted">Cannot change Admin role</span>
-                        }
-                        else
-                        {
-                            <form asp-action="ChangeRole" asp-route-userId="@user.UserId" method="post" class="d-inline">
-                                <select name="newRole" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
-                                    <option value="@Roles.Member" selected="@(user.CurrentRole == Roles.Member)">Member</option>
-                                    <option value="@Roles.Manager" selected="@(user.CurrentRole == Roles.Manager)">Manager</option>
-                                </select>
-                            </form>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Full Name</th>
+                        <th>Email</th>
+                        <th>Current Status</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold">@user.FullName</div>
+                            </td>
+                            <td>@user.Email</td>
+                            <td>
+                                @if (user.IsAdmin)
+                                {
+                                    <span class="badge rounded-pill bg-danger">@user.CurrentRole</span>
+                                }
+                                else if (user.CurrentRole == Roles.Manager)
+                                {
+                                    <span class="badge rounded-pill bg-warning text-dark">@user.CurrentRole</span>
+                                }
+                                else
+                                {
+                                    <span class="badge rounded-pill bg-info text-dark">@user.CurrentRole</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                @if (user.IsAdmin)
+                                {
+                                    <small class="text-muted italic">System Administrator</small>
+                                }
+                                else
+                                {
+                                    <form asp-action="ChangeRole" asp-route-userId="@user.UserId" method="post" class="d-inline-flex justify-content-end">
+                                        <select name="newRole"
+                                                class="form-select form-select-sm w-auto me-2"
+                                                onchange="return confirmRoleChange(this)">
+                                            <option value="@Roles.Member" selected="@(user.CurrentRole == Roles.Member)">Member</option>
+                                            <option value="@Roles.Manager" selected="@(user.CurrentRole == Roles.Manager)">Manager</option>
+                                        </select>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        function confirmRoleChange(selectElement) {
+            const role = selectElement.value;
+            if (confirm(`Are you sure you want to change this user to ${role}?`)) {
+                selectElement.form.submit();
+            } else {
+                location.reload();
+            }
+        }
+    </script>
+}

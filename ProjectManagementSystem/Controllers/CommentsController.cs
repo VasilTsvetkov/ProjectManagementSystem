@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.Controllers
 {
+    using Constants;
     using Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
@@ -21,35 +22,25 @@
         public async Task<IActionResult> Create(CommentViewModel model)
         {
             if (!ModelState.IsValid)
-                return RedirectToAction("Details", "Tasks", new { projectId = model.ProjectId, id = model.TaskId });
+                return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
 
             var userId = _userManager.GetUserId(User);
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             await _commentService.CreateCommentAsync(model, userId);
 
-            return RedirectToAction("Details", "Tasks", new { projectId = model.ProjectId, id = model.TaskId });
+            return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
         }
 
         [HttpGet("{id}/edit")]
         [ProducesResponseType(typeof(CommentViewModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Edit(int id)
         {
             var userId = _userManager.GetUserId(User);
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             var model = await _commentService.GetCommentForEditAsync(id, userId);
-
             if (model == null) return NotFound();
 
             return View(model);
@@ -64,37 +55,26 @@
             if (!ModelState.IsValid) return View(model);
 
             var userId = _userManager.GetUserId(User);
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             var success = await _commentService.UpdateCommentAsync(id, model, userId);
-
             if (!success) return NotFound();
 
-            return RedirectToAction("Details", "Tasks", new { projectId = model.ProjectId, id = model.TaskId });
+            return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
         }
 
         [HttpPost("{id}/delete")]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete(int id, int projectId)
         {
             var userId = _userManager.GetUserId(User);
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            if (userId == null) return Unauthorized();
 
             var result = await _commentService.DeleteCommentAsync(id, userId);
-
             if (result == null) return NotFound();
 
-            return RedirectToAction("Details", "Tasks", new { projectId, id = result.Value.TaskId });
+            return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId, id = result.Value.TaskId });
         }
     }
 }

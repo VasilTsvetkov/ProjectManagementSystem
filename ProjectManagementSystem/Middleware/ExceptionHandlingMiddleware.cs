@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.Middleware
 {
+    using Constants;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
     using System;
@@ -36,7 +37,7 @@
                 return context.Response.WriteAsJsonAsync(new { error = "A server error occurred. Please try again." });
             }
 
-            context.Response.Redirect("/Home/Error");
+            context.Response.Redirect(RouteConstants.ErrorPath);
             return Task.CompletedTask;
         }
     }

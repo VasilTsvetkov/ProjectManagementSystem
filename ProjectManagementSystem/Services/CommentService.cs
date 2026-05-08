@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.Services
 {
+    using Constants;
     using Enums;
     using Interfaces;
     using Microsoft.Extensions.Logging;
@@ -29,10 +30,12 @@
 
             await _commentRepository.AddAsync(comment);
 
-            var task = await _taskRepository.GetByIdAsync(model.TaskId);
-            string taskTag = task?.Tag ?? "a task";
+            string taskTag = await GetTaskTagAsync(model.TaskId);
 
-            await _activityService.LogAsync(userId, $"Added a comment to {taskTag}", ActivityType.CommentAction);
+            await _activityService.LogAsync(
+                userId,
+                string.Format(MessageConstants.ActivityAddedComment, taskTag),
+                ActivityType.CommentAction);
 
             _logger.LogInformation("User {UserId} added a comment to Task {TaskId}", userId, model.TaskId);
 
@@ -69,10 +72,13 @@
 
             if (result)
             {
-                var task = await _taskRepository.GetByIdAsync(comment.TaskId);
-                string taskTag = task?.Tag ?? "a task";
+                string taskTag = await GetTaskTagAsync(comment.TaskId);
 
-                await _activityService.LogAsync(userId, $"Updated a comment on {taskTag}", ActivityType.CommentAction);
+                await _activityService.LogAsync(
+                    userId,
+                    string.Format(MessageConstants.ActivityUpdatedComment, taskTag),
+                    ActivityType.CommentAction);
+
                 _logger.LogInformation("Comment {CommentId} updated by user {UserId}", id, userId);
             }
 
@@ -89,18 +95,35 @@
             }
 
             var taskId = comment.TaskId;
-            var task = await _taskRepository.GetByIdAsync(taskId);
-            string taskTag = task?.Tag ?? "a task";
+            string taskTag = await GetTaskTagAsync(taskId);
 
             var deleted = await _commentRepository.DeleteAsync(id);
 
             if (deleted)
             {
-                await _activityService.LogAsync(userId, $"Deleted a comment from {taskTag}", ActivityType.CommentAction);
+                await _activityService.LogAsync(
+                    userId,
+                    string.Format(MessageConstants.ActivityDeletedComment, taskTag),
+                    ActivityType.CommentAction);
+
                 _logger.LogInformation("Comment {CommentId} deleted from Task {TaskId} by user {UserId}", id, taskId, userId);
             }
 
             return deleted ? (true, taskId) : null;
+        }
+
+        private async Task<string> GetTaskTagAsync(int taskId)
+        {
+            var task = await _taskRepository.GetByIdAsync(taskId);
+
+            if (task == null)
+            {
+                return MessageConstants.MissingTaskIdentifier;
+            }
+
+            return !string.IsNullOrWhiteSpace(task.Tag)
+                ? task.Tag
+                : MessageConstants.UntitledTask;
         }
     }
 }

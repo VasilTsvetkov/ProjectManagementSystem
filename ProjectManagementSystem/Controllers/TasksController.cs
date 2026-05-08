@@ -1,7 +1,7 @@
 ﻿namespace ProjectManagementSystem.Controllers
 {
     using Constants;
-    using Enums;
+    using Enums.Task;
     using Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
@@ -102,24 +102,12 @@
             return RedirectToAction(nameof(Index), new { projectId });
         }
 
-        [HttpGet("{projectId}/{id}/delete")]
-        [Authorize(Roles = Roles.AdminOrManager)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int projectId, int id)
-        {
-            var model = await _taskService.GetTaskForDeleteAsync(id);
-            if (model == null) return NotFound();
-
-            ViewBag.ProjectId = projectId;
-            return View(model);
-        }
-
         [HttpPost("{projectId}/{id}/delete")]
         [Authorize(Roles = Roles.AdminOrManager)]
+        [ValidateAntiForgeryToken]
         [ProducesResponseType(StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteConfirmed(int projectId, int id)
+        public async Task<IActionResult> Delete(int projectId, int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
@@ -147,13 +135,15 @@
         [HttpPost("{projectId}/{id}/status")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateStatus(int projectId, int id, [FromBody] ProjectTaskStatus status)
+        public async Task<IActionResult> UpdateStatus(int projectId, int id, [FromBody] Status status)
         {
+            _ = projectId;
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
             var updated = await _taskService.UpdateTaskStatusAsync(id, status, userId);
-            if (!updated || projectId == 0) return NotFound();
+            if (!updated) return NotFound();
 
             return Ok();
         }

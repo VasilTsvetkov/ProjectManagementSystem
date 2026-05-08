@@ -2,7 +2,7 @@
 {
     using Data;
     using DTOs;
-    using Enums;
+    using Enums.Task;
     using Interfaces;
     using Microsoft.EntityFrameworkCore;
     using Models;
@@ -47,15 +47,15 @@
         {
             var maxNumber = await _context.Tasks
                 .Where(t => t.Type == entity.Type)
-                .MaxAsync(t => (int?)t.TaskNumber) ?? 0;
+                .MaxAsync(t => (int?)t.Number) ?? 0;
 
-            entity.TaskNumber = maxNumber + 1;
+            entity.Number = maxNumber + 1;
 
             await _context.Tasks.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdateStatusAsync(int id, ProjectTaskStatus status)
+        public async Task<bool> UpdateStatusAsync(int id, Status status)
         {
             var existing = await _context.Tasks.FindAsync(id);
             if (existing == null) return false;

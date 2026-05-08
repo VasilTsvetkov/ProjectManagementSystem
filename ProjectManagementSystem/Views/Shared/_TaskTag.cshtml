@@ -1,8 +1,17 @@
 ﻿@model dynamic
 
-@using ProjectManagementSystem.Helpers
-
 @{
     var color = ColorHelper.GetTaskColor(Model.Tag);
-    var icon = Model.TypeIcon;
-}<span class="d-inline-flex align-items-center gap-1">@icon<span class="badge" style="background-color: @color">@Model.Tag</span></span>
+}
+
+<span class="d-inline-flex align-items-center gap-2">
+    @if (!string.IsNullOrEmpty(Model.TypeIcon))
+    {
+        <i class="bi @Model.TypeIcon text-muted" title="Task Type"></i>
+    }
+    
+    <span class="badge rounded-pill shadow-sm fw-bold" 
+          style="background-color: @color; letter-spacing: 0.5px; font-size: 0.75rem;">
+        @Model.Tag
+    </span>
+</span>

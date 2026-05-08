@@ -2,19 +2,22 @@
 {
     public class Project
     {
-        public Project()
-        {
-            Tasks = [];
-        }
-
         public int Id { get; set; }
+
         public int Number { get; set; }
-        public string Tag { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public string CreatorId { get; set; } = string.Empty;
-        public ApplicationUser? Creator { get; set; }
-        public ICollection<ProjectTask> Tasks { get; set; }
+
+        public required string Tag { get; set; }
+
+        public required string Name { get; set; }
+
+        public string? Description { get; set; }
+
+        public required DateTime CreatedAt { get; set; }
+
+        public required string CreatorId { get; set; }
+
+        public virtual ApplicationUser Creator { get; set; } = null!;
+
+        public virtual ICollection<ProjectTask> Tasks { get; set; } = [];
     }
 }

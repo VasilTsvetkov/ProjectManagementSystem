@@ -5,10 +5,15 @@
     public class ActivityLog
     {
         public int Id { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public string UserId { get; set; } = string.Empty;
-        public ApplicationUser User { get; set; } = null!;
-        public ActivityType Type { get; set; }
-        public DateTime Timestamp { get; set; }
+
+        public required string Message { get; set; }
+
+        public required string UserId { get; set; }
+
+        public virtual ApplicationUser User { get; set; } = null!;
+
+        public required ActivityType Type { get; set; }
+
+        public required DateTime Timestamp { get; set; }
     }
 }

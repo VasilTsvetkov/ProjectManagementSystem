@@ -1,10 +1,16 @@
 ﻿namespace ProjectManagementSystem.ViewModels.TimeLogs
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class UserMatrixRowViewModel
     {
-        public string UserId { get; set; } = null!;
-        public string FullName { get; set; } = null!;
-        public Dictionary<int, double> DailyHours { get; set; } = [];
+        public required string UserId { get; init; }
+
+        public required string FullName { get; init; }
+
+        public IReadOnlyDictionary<int, double> DailyHours { get; init; } = new Dictionary<int, double>();
+
         public double TotalHours => DailyHours.Values.Sum();
     }
 }

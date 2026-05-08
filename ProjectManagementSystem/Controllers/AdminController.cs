@@ -29,11 +29,11 @@
 
             if (success)
             {
-                TempData["Success"] = message;
+                TempData[NotificationKeys.Success] = message;
             }
             else
             {
-                TempData["Error"] = message;
+                TempData[NotificationKeys.Error] = message;
             }
 
             return RedirectToAction(nameof(Index));

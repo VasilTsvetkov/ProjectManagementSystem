@@ -1,7 +1,9 @@
 ﻿namespace ProjectManagementSystem.Services
 {
+    using Constants;
     using Data;
-    using Enums;
+    using DTOs;
+    using Enums.Task;
     using Interfaces;
     using Microsoft.EntityFrameworkCore;
     using ViewModels.Home;
@@ -14,7 +16,7 @@
         public async Task<IndexViewModel> GetHomeIndexDataAsync(string userId)
         {
             var myAssignedTasksQuery = _context.Tasks
-                .Where(t => t.AssigneeId == userId && t.Status != ProjectTaskStatus.Done);
+                .Where(t => t.AssigneeId == userId && t.Status != Status.Done);
 
             var pendingCount = await myAssignedTasksQuery.CountAsync();
             var overdueCount = await myAssignedTasksQuery.CountAsync(t => t.Deadline < DateTime.UtcNow);
@@ -32,7 +34,8 @@
                      Type = t.Type,
                      Priority = t.Priority,
                      Status = t.Status,
-                     Deadline = t.Deadline
+                     Deadline = t.Deadline,
+                     AssigneeName = t.Assignee != null ? t.Assignee.FullName : MessageConstants.Unassigned
                  }).ToListAsync();
 
             var recentActivities = await _context.ActivityLogs
