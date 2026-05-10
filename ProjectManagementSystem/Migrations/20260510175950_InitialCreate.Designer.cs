@@ -12,8 +12,8 @@ using ProjectManagementSystem.Data;
 namespace ProjectManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260330061241_AddTagAndTaskNumber")]
-    partial class AddTagAndTaskNumber
+    [Migration("20260510175950_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -162,6 +162,35 @@ namespace ProjectManagementSystem.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ProjectManagementSystem.Models.ActivityLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Timestamp");
+
+                    b.ToTable("ActivityLogs");
+                });
+
             modelBuilder.Entity("ProjectManagementSystem.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -275,28 +304,23 @@ namespace ProjectManagementSystem.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedById")
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CreatedByUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Tag")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Projects");
                 });
@@ -310,7 +334,6 @@ namespace ProjectManagementSystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AssigneeId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -320,8 +343,10 @@ namespace ProjectManagementSystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
@@ -329,10 +354,11 @@ namespace ProjectManagementSystem.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("ReporterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("TaskNumber")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -347,6 +373,8 @@ namespace ProjectManagementSystem.Migrations
                     b.HasIndex("AssigneeId");
 
                     b.HasIndex("ProjectId");
+
+                    b.HasIndex("ReporterId");
 
                     b.ToTable("Tasks");
                 });
@@ -363,7 +391,6 @@ namespace ProjectManagementSystem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Hours")
@@ -436,12 +463,23 @@ namespace ProjectManagementSystem.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProjectManagementSystem.Models.ActivityLog", b =>
+                {
+                    b.HasOne("ProjectManagementSystem.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProjectManagementSystem.Models.Comment", b =>
                 {
                     b.HasOne("ProjectManagementSystem.Models.ProjectTask", "Task")
                         .WithMany("Comments")
                         .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ProjectManagementSystem.Models.ApplicationUser", "User")
@@ -457,20 +495,21 @@ namespace ProjectManagementSystem.Migrations
 
             modelBuilder.Entity("ProjectManagementSystem.Models.Project", b =>
                 {
-                    b.HasOne("ProjectManagementSystem.Models.ApplicationUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
+                    b.HasOne("ProjectManagementSystem.Models.ApplicationUser", "Creator")
+                        .WithMany("CreatedProjects")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
-                    b.Navigation("CreatedBy");
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("ProjectManagementSystem.Models.ProjectTask", b =>
                 {
                     b.HasOne("ProjectManagementSystem.Models.ApplicationUser", "Assignee")
-                        .WithMany("Tasks")
+                        .WithMany("AssignedTasks")
                         .HasForeignKey("AssigneeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("ProjectManagementSystem.Models.Project", "Project")
                         .WithMany("Tasks")
@@ -478,9 +517,17 @@ namespace ProjectManagementSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProjectManagementSystem.Models.ApplicationUser", "Reporter")
+                        .WithMany("ReportedTasks")
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Assignee");
 
                     b.Navigation("Project");
+
+                    b.Navigation("Reporter");
                 });
 
             modelBuilder.Entity("ProjectManagementSystem.Models.TimeLog", b =>
@@ -488,7 +535,7 @@ namespace ProjectManagementSystem.Migrations
                     b.HasOne("ProjectManagementSystem.Models.ProjectTask", "Task")
                         .WithMany("TimeLogs")
                         .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ProjectManagementSystem.Models.ApplicationUser", "User")
@@ -504,9 +551,13 @@ namespace ProjectManagementSystem.Migrations
 
             modelBuilder.Entity("ProjectManagementSystem.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("AssignedTasks");
+
                     b.Navigation("Comments");
 
-                    b.Navigation("Tasks");
+                    b.Navigation("CreatedProjects");
+
+                    b.Navigation("ReportedTasks");
 
                     b.Navigation("TimeLogs");
                 });

@@ -83,7 +83,7 @@
                                                    asp-route-projectId="@task.ProjectId"
                                                    asp-route-id="@task.Id"
                                                    class="text-decoration-none">
-                                                    <span class="badge bg-light text-dark border">@task.Tag</span>
+                                                    <partial name="_TaskTag" model="task" />
                                                 </a>
                                             </td>
                                             <td><span class="fw-bold">@task.Title</span></td>
@@ -94,14 +94,24 @@
                                                 @{
                                                     var priorityClass = task.Priority switch
                                                     {
-                                                        Priority.Critical => "bg-dark",
-                                                        Priority.High => "bg-danger",
-                                                        Priority.Medium => "bg-warning text-dark",
-                                                        Priority.Low => "bg-info text-white",
-                                                        _ => "bg-secondary"
+                                                        Priority.Critical => "bg-danger text-white fw-bold",
+                                                        Priority.High => "bg-warning text-dark",
+                                                        Priority.Medium => "bg-primary text-white",
+                                                        Priority.Low => "bg-success text-white",
+                                                        _ => "bg-secondary text-white"
                                                     };
                                                 }
-                                                <span class="badge @priorityClass rounded-pill">@task.Priority</span>
+                                                <span class="badge @priorityClass rounded-pill px-3 py-2">
+                                                    @if (task.Priority == Priority.Critical)
+                                                    {
+                                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                                    }
+                                                    else if (task.Priority == Priority.High)
+                                                    {
+                                                        <i class="bi bi-arrow-up-circle-fill me-1"></i>
+                                                    }
+                                                    @task.Priority
+                                                </span>
                                             </td>
                                         </tr>
                                     }

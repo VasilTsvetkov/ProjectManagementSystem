@@ -4,121 +4,110 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container-fluid mt-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="display-6 fw-bold text-dark">
-                <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                <span class="text-muted fs-4 ms-2">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Model.Month) @Model.Year</span>
-            </h2>
-        </div>
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body bg-light rounded">
+        <form method="get" asp-controller="Dashboard" asp-action="Index">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="Month" class="form-label small fw-bold text-uppercase text-muted">Month</label>
+                    <select asp-for="Month" name="month" class="form-select border-2" asp-items="Model.AvailableMonths"></select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Year" class="form-label small fw-bold text-uppercase text-muted">Year</label>
+                    <select asp-for="Year" name="year" class="form-select border-2" asp-items="Model.AvailableYears"></select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                        <i class="bi bi-filter me-2"></i>Apply Filter
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body bg-light rounded">
-            <form method="get" asp-controller="Dashboard" asp-action="Index">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label asp-for="Month" class="form-label small fw-bold text-uppercase text-muted">Month</label>
-                        <select asp-for="Month" name="month" class="form-select border-2" asp-items="Model.AvailableMonths"></select>
-                    </div>
-                    <div class="col-md-4">
-                        <label asp-for="Year" class="form-label small fw-bold text-uppercase text-muted">Year</label>
-                        <select asp-for="Year" name="year" class="form-select border-2" asp-items="Model.AvailableYears"></select>
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100 shadow-sm">
-                            <i class="bi bi-filter me-2"></i>Apply Filter
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="row mb-4 g-3">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm border-start border-primary border-4 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted text-uppercase small fw-bold">Total Hours</h6>
-                    <h2 class="mb-0 fw-bold text-primary">
-                        @Model.Stats.TotalHours
-                    </h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm border-start border-success border-4 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted text-uppercase small fw-bold">Projects</h6>
-                    <h2 class="mb-0 fw-bold text-success">@Model.Stats.TotalProjects</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm border-start border-info border-4 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted text-uppercase small fw-bold">Tasks</h6>
-                    <h2 class="mb-0 fw-bold text-info">@Model.Stats.TotalTasks</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm border-start border-warning border-4 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted text-uppercase small fw-bold">Time Logs</h6>
-                    <h2 class="mb-0 fw-bold text-warning">@Model.Stats.TotalLogs</h2>
-                </div>
+<div class="row mb-4 g-3">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm border-start border-primary border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Total Hours</h6>
+                <h2 class="mb-0 fw-bold text-primary">
+                    @TimeFormatter.Format(Model.Stats.TotalHours)
+                </h2>
             </div>
         </div>
     </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white py-3 border-bottom">
-            <h5 class="mb-0 fw-bold text-dark">Time Breakdown by Project</h5>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm border-start border-success border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Projects</h6>
+                <h2 class="mb-0 fw-bold text-success">@Model.Stats.TotalProjects</h2>
+            </div>
         </div>
-        <div class="card-body p-0">
-            @if (Model.ProjectBreakdown.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm border-start border-info border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Tasks</h6>
+                <h2 class="mb-0 fw-bold text-info">@Model.Stats.TotalTasks</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm border-start border-warning border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Time Logs</h6>
+                <h2 class="mb-0 fw-bold text-warning">@Model.Stats.TotalLogs</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 border-bottom">
+        <h5 class="mb-0 fw-bold text-dark">Time Breakdown by Project</h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.ProjectBreakdown.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 small text-uppercase fw-bold text-muted">Project</th>
+                            <th class="small text-uppercase fw-bold text-muted">Tag</th>
+                            <th class="small text-uppercase fw-bold text-muted">Total Time</th>
+                            <th class="small text-uppercase fw-bold text-muted text-center">Tasks</th>
+                            <th class="small text-uppercase fw-bold text-muted text-center">Logs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var project in Model.ProjectBreakdown)
+                        {
                             <tr>
-                                <th class="ps-4 small text-uppercase fw-bold text-muted">Project</th>
-                                <th class="small text-uppercase fw-bold text-muted">Tag</th>
-                                <th class="small text-uppercase fw-bold text-muted">Total Time</th>
-                                <th class="small text-uppercase fw-bold text-muted text-center">Tasks</th>
-                                <th class="small text-uppercase fw-bold text-muted text-center">Logs</th>
+                                <td class="ps-4 fw-bold text-dark">@project.ProjectName</td>
+                                <td>
+                                    <partial name="_ProjectTag" model="@project.ProjectTag" />
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-primary border border-primary-subtle px-3 py-2 fs-6">
+                                        @TimeFormatter.Format(project.TotalHours)
+                                    </span>
+                                </td>
+                                <td class="text-center">@project.TaskCount</td>
+                                <td class="text-center">@project.LogCount</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var project in Model.ProjectBreakdown)
-                            {
-                                <tr>
-                                    <td class="ps-4 fw-bold text-dark">@project.ProjectName</td>
-                                    <td>
-                                        <span class="badge bg-white border text-dark fw-medium">@project.ProjectTag</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-primary border border-primary-subtle px-3 py-2 fs-6">
-                                            @project.TotalHours
-                                        </span>
-                                    </td>
-                                    <td class="text-center">@project.TaskCount</td>
-                                    <td class="text-center">@project.LogCount</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="p-5 text-center">
-                    <i class="bi bi-calendar2-x text-muted display-4"></i>
-                    <p class="text-muted mt-2">No work recorded for the selected period.</p>
-                </div>
-            }
-        </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-5 text-center">
+                <i class="bi bi-calendar2-x text-muted display-4"></i>
+                <p class="text-muted mt-2">No work recorded for the selected period.</p>
+            </div>
+        }
     </div>
 </div>

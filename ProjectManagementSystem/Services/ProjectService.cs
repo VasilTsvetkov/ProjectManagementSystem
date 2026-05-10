@@ -23,6 +23,7 @@
             return projects.Select(p => new ProjectDisplayViewModel
             {
                 Id = p.Id,
+                Number = p.Number,
                 Tag = p.Tag,
                 Name = p.Name ?? MessageConstants.UntitledProject,
                 Description = p.Description,
@@ -58,6 +59,7 @@
             return new ProjectDisplayViewModel
             {
                 Id = project.Id,
+                Number = project.Number,
                 Tag = project.Tag,
                 Name = project.Name ?? MessageConstants.UntitledProject,
                 Description = project.Description,
@@ -74,7 +76,6 @@
             var project = new Project
             {
                 Name = projectName,
-                Tag = string.Empty,
                 Description = model.Description,
                 CreatorId = creatorId,
                 CreatedAt = DateTime.UtcNow

@@ -28,7 +28,6 @@
                 .MaxAsync(p => (int?)p.Number) ?? 0;
 
             entity.Number = maxNumber + 1;
-            entity.Tag = $"{ProjectConstants.TagPrefix}-{entity.Number}";
 
             await _context.Projects.AddAsync(entity);
             await _context.SaveChangesAsync();

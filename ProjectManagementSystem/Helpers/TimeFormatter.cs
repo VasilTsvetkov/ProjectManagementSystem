@@ -8,7 +8,7 @@
 	{
 		public static string Format(double totalHours)
 		{
-			if (totalHours <= 0.001) return ".";
+			if (totalHours <= 0.001) return "0h";
 
 			var totalMinutes = (int)Math.Round(totalHours * TimeConfig.MinutesInHour);
 

@@ -1,12 +1,14 @@
 ﻿namespace ProjectManagementSystem.Models
 {
+    using Constants;
+
     public class Project
     {
         public int Id { get; set; }
 
         public int Number { get; set; }
 
-        public required string Tag { get; set; }
+        public string Tag => $"{ProjectConstants.TagPrefix}-{Number}";
 
         public required string Name { get; set; }
 
