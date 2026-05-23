@@ -40,15 +40,15 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
                                 <label asp-for="Type" class="form-label fw-bold small text-uppercase text-muted"></label>
-                                <select asp-for="Type" asp-items="Html.GetEnumSelectList<ProjectManagementSystem.Enums.Task.Type>()" class="form-select border-2"></select>
+                                <select asp-for="Type" asp-items="Html.GetEnumSelectList<Type>()" class="form-select border-2"></select>
                             </div>
                             <div class="col-md-4">
                                 <label asp-for="Priority" class="form-label fw-bold small text-uppercase text-muted"></label>
-                                <select asp-for="Priority" asp-items="Html.GetEnumSelectList<ProjectManagementSystem.Enums.Task.Priority>()" class="form-select border-2"></select>
+                                <select asp-for="Priority" asp-items="Html.GetEnumSelectList<Priority>()" class="form-select border-2"></select>
                             </div>
                             <div class="col-md-4">
                                 <label asp-for="Status" class="form-label fw-bold small text-uppercase text-muted"></label>
-                                <select asp-for="Status" asp-items="Html.GetEnumSelectList<ProjectManagementSystem.Enums.Task.Status>()" class="form-select border-2"></select>
+                                <select asp-for="Status" asp-items="Html.GetEnumSelectList<Status>()" class="form-select border-2"></select>
                             </div>
                         </div>
 

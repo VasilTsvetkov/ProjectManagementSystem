@@ -1,4 +1,4 @@
-﻿namespace ProjectManagementSystem.ViewModels.Comments
+﻿namespace ProjectManagementSystem.Web.ViewModels.Comments
 {
     public class CommentListViewModel
     {

@@ -1,9 +1,9 @@
-﻿namespace ProjectManagementSystem.ViewModels.Tasks
+﻿namespace ProjectManagementSystem.Web.ViewModels.Tasks
 {
-    using Enums.Task;
-    using Helpers;
+    using ProjectManagementSystem.BL.Enums.Task;
+    using ProjectManagementSystem.BL.Helpers;
     using System;
-    using Type = Enums.Task.Type;
+    using Type = BL.Enums.Task.Type;
 
     public class TaskListViewModel
     {

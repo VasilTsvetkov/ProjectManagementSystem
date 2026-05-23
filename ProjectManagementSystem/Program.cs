@@ -1,5 +1,6 @@
-namespace ProjectManagementSystem
+namespace ProjectManagementSystem.Web
 {
+    using BL.Extensions;
     using Extensions;
     using Middleware;
     using Serilog;

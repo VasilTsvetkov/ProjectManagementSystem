@@ -1,10 +1,10 @@
-﻿namespace ProjectManagementSystem.ViewModels.Tasks
+﻿namespace ProjectManagementSystem.Web.ViewModels.Tasks
 {
-    using Enums.Task;
+    using BL.Enums.Task;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using System;
     using System.Collections.Generic;
-    using Type = Enums.Task.Type;
+    using Type = BL.Enums.Task.Type;
 
     public class TaskViewModel
     {

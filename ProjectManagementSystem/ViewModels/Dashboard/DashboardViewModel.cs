@@ -1,6 +1,6 @@
-﻿namespace ProjectManagementSystem.ViewModels.Dashboard
+﻿namespace ProjectManagementSystem.Web.ViewModels.Dashboard
 {
-    using DTOs.Dashboard;
+    using BL.DTOs.Dashboard;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using System.Collections.Generic;
 

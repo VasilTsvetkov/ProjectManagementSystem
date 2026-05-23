@@ -1,8 +1,8 @@
-﻿namespace ProjectManagementSystem.ViewModels.Home
+﻿namespace ProjectManagementSystem.Web.ViewModels.Home
 {
-    using DTOs;
+    using BL.DTOs;
+    using BL.DTOs.Tasks;
     using System.Collections.Generic;
-    using Tasks;
 
     public class IndexViewModel
     {
@@ -10,7 +10,7 @@
 
         public int OverdueTasksCount { get; init; }
 
-        public required IReadOnlyList<TaskListViewModel> UrgentTasks { get; init; }
+        public required IReadOnlyList<TaskDto> UrgentTasks { get; init; }
 
         public required IReadOnlyList<ActivityDto> RecentActivities { get; init; }
     }

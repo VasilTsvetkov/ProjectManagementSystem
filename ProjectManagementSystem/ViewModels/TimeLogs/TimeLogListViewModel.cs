@@ -1,6 +1,6 @@
-﻿namespace ProjectManagementSystem.ViewModels.TimeLogs
+﻿namespace ProjectManagementSystem.Web.ViewModels.TimeLogs
 {
-    using Helpers;
+    using BL.Helpers;
 
     public class TimeLogListViewModel
     {

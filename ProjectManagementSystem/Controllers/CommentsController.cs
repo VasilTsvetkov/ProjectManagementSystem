@@ -1,11 +1,13 @@
-﻿namespace ProjectManagementSystem.Controllers
+﻿namespace ProjectManagementSystem.Web.Controllers
 {
-    using Constants;
-    using Interfaces;
+    using BL.Constants;
+    using BL.Interfaces;
+    using BL.Models;
+    using BL.DTOs;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
-    using Models;
+    using System.Threading.Tasks;
     using ViewModels.Comments;
 
     [Authorize]
@@ -27,7 +29,15 @@
             var userId = _userManager.GetUserId(User);
             if (userId == null) return Unauthorized();
 
-            await _commentService.CreateCommentAsync(model, userId);
+            var dto = new CommentDto
+            {
+                Content = model.Content,
+                TaskId = model.TaskId,
+                ProjectId = model.ProjectId,
+                AuthorName = string.Empty
+            };
+
+            await _commentService.CreateCommentAsync(dto, userId);
 
             return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });
         }
@@ -40,8 +50,15 @@
             var userId = _userManager.GetUserId(User);
             if (userId == null) return Unauthorized();
 
-            var model = await _commentService.GetCommentForEditAsync(id, userId);
-            if (model == null) return NotFound();
+            var dto = await _commentService.GetCommentForEditAsync(id, userId);
+            if (dto == null) return NotFound();
+
+            var model = new CommentViewModel
+            {
+                Content = dto.Content,
+                TaskId = dto.TaskId,
+                ProjectId = dto.ProjectId
+            };
 
             return View(model);
         }
@@ -57,7 +74,16 @@
             var userId = _userManager.GetUserId(User);
             if (userId == null) return Unauthorized();
 
-            var success = await _commentService.UpdateCommentAsync(id, model, userId);
+            var dto = new CommentDto
+            {
+                Id = id,
+                Content = model.Content,
+                TaskId = model.TaskId,
+                ProjectId = model.ProjectId,
+                AuthorName = string.Empty
+            };
+
+            var success = await _commentService.UpdateCommentAsync(id, dto, userId);
             if (!success) return NotFound();
 
             return RedirectToAction(TaskConstants.DetailsAction, TaskConstants.Controller, new { projectId = model.ProjectId, id = model.TaskId });

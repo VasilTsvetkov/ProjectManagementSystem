@@ -1,14 +1,21 @@
-﻿namespace ProjectManagementSystem.Controllers
+﻿namespace ProjectManagementSystem.Web.Controllers
 {
-    using Constants;
-    using Enums.Task;
-    using Interfaces;
+    using BL.Constants;
+    using BL.Enums.Task;
+    using BL.Interfaces;
+    using BL.Models;
+    using BL.DTOs.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
-    using Models;
+    using Microsoft.AspNetCore.Mvc.Rendering;
     using System.Security.Claims;
+    using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using System.Linq;
     using ViewModels.Tasks;
+    using ViewModels.Comments;
+    using ViewModels.TimeLogs;
 
     [Authorize]
     [Route("tasks")]
@@ -28,7 +35,20 @@
             ViewBag.ProjectId = projectId;
             ViewBag.ProjectName = result.Value.ProjectName;
 
-            return View(result.Value.Tasks);
+            var viewModels = result.Value.Tasks.Select(dto => new TaskListViewModel
+            {
+                Id = dto.Id,
+                ProjectId = projectId,
+                Tag = dto.Tag,
+                Title = dto.Title,
+                Type = dto.Type,
+                Priority = dto.Priority,
+                Status = dto.Status,
+                Deadline = dto.Deadline,
+                AssigneeName = dto.AssigneeName
+            }).ToList();
+
+            return View(viewModels);
         }
 
         [HttpGet("{projectId}/create")]
@@ -36,7 +56,23 @@
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create(int projectId)
         {
-            var model = await _taskService.GetTaskViewModelForCreateAsync();
+            var dto = await _taskService.GetTaskForCreateAsync();
+
+            var model = new TaskViewModel
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                Type = dto.Type,
+                Priority = dto.Priority,
+                Deadline = dto.Deadline,
+                AssigneeId = dto.AssigneeId,
+                Users = dto.Users.ConvertAll(u => new SelectListItem
+                {
+                    Value = u.Id,
+                    Text = u.FullName
+                })
+            };
+
             ViewBag.ProjectId = projectId;
             return View(model);
         }
@@ -50,15 +86,29 @@
         {
             if (!ModelState.IsValid)
             {
-                var createModel = await _taskService.GetTaskViewModelForCreateAsync();
-                model.Users = createModel.Users;
+                var createDto = await _taskService.GetTaskForCreateAsync();
+                model.Users = createDto.Users.ConvertAll(u => new SelectListItem
+                {
+                    Value = u.Id,
+                    Text = u.FullName
+                });
                 return View(model);
             }
 
             var currentUserId = _userManager.GetUserId(User);
             if (currentUserId == null) return Unauthorized();
 
-            await _taskService.CreateTaskAsync(projectId, model, currentUserId);
+            var dto = new TaskDto
+            {
+                Title = model.Title,
+                Description = model.Description,
+                AssigneeId = model.AssigneeId,
+                Priority = model.Priority,
+                Type = model.Type,
+                Deadline = model.Deadline
+            };
+
+            await _taskService.CreateTaskAsync(projectId, dto, currentUserId);
             return RedirectToAction(nameof(Index), new { projectId });
         }
 
@@ -68,8 +118,25 @@
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Edit(int projectId, int id)
         {
-            var model = await _taskService.GetTaskForEditAsync(id);
-            if (model == null) return NotFound();
+            var dto = await _taskService.GetTaskForEditAsync(id);
+            if (dto == null) return NotFound();
+
+            var model = new EditTaskViewModel
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                AssigneeId = dto.AssigneeId,
+                Priority = dto.Priority,
+                Type = dto.Type,
+                Deadline = dto.Deadline,
+                Status = dto.Status,
+                Users = dto.Users.ConvertAll(u => new SelectListItem
+                {
+                    Value = u.Id,
+                    Text = u.FullName,
+                    Selected = u.Id == dto.AssigneeId
+                })
+            };
 
             ViewBag.ProjectId = projectId;
             return View(model);
@@ -85,10 +152,14 @@
         {
             if (!ModelState.IsValid)
             {
-                var editModel = await _taskService.GetTaskForEditAsync(id);
-                if (editModel != null)
+                var editDto = await _taskService.GetTaskForEditAsync(id);
+                if (editDto != null)
                 {
-                    model.Users = editModel.Users;
+                    model.Users = editDto.Users.ConvertAll(u => new SelectListItem
+                    {
+                        Value = u.Id,
+                        Text = u.FullName
+                    });
                 }
                 return View(model);
             }
@@ -96,7 +167,19 @@
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
-            var updated = await _taskService.UpdateTaskAsync(id, model, userId);
+            var dto = new TaskDto
+            {
+                Id = id,
+                Title = model.Title,
+                Description = model.Description,
+                AssigneeId = model.AssigneeId,
+                Priority = model.Priority,
+                Type = model.Type,
+                Deadline = model.Deadline,
+                Status = model.Status
+            };
+
+            var updated = await _taskService.UpdateTaskAsync(id, dto, userId);
             if (!updated) return NotFound();
 
             return RedirectToAction(nameof(Index), new { projectId });
@@ -126,8 +209,41 @@
             var userId = _userManager.GetUserId(User);
             if (userId == null) return Unauthorized();
 
-            var model = await _taskService.GetTaskDetailsAsync(projectId, id, userId);
-            if (model == null) return NotFound();
+            var dto = await _taskService.GetTaskDetailsAsync(projectId, id, userId);
+            if (dto == null) return NotFound();
+
+            var model = new TaskDetailsViewModel
+            {
+                Id = dto.Id,
+                ProjectId = dto.ProjectId,
+                Tag = dto.Tag,
+                Title = dto.Title,
+                Description = dto.Description,
+                Type = dto.Type,
+                Priority = dto.Priority,
+                Status = dto.Status,
+                Deadline = dto.Deadline,
+                AssigneeName = dto.AssigneeName,
+                ReporterName = dto.ReporterName,
+                TotalHours = dto.TotalHours,
+                Comments = dto.Comments.Select(c => new CommentListViewModel
+                {
+                    Id = c.Id,
+                    Content = c.Content,
+                    AuthorName = c.AuthorName,
+                    CreatedAt = c.CreatedAt,
+                    CanEdit = c.CanEdit
+                }).ToList(),
+                TimeLogs = dto.TimeLogs.Select(t => new TimeLogListViewModel
+                {
+                    Id = t.Id,
+                    Hours = t.Hours,
+                    Date = t.Date,
+                    Description = t.Description,
+                    UserName = t.UserName ?? MessageConstants.Unassigned,
+                    CanEdit = t.CanEdit
+                }).ToList()
+            };
 
             return View(model);
         }
@@ -160,7 +276,20 @@
             ViewBag.ProjectName = result.Value.ProjectName;
             ViewBag.ProjectTag = result.Value.ProjectTag;
 
-            return View(result.Value.Tasks);
+            var viewModels = result.Value.Tasks.Select(dto => new TaskListViewModel
+            {
+                Id = dto.Id,
+                ProjectId = projectId,
+                Tag = dto.Tag,
+                Title = dto.Title,
+                Type = dto.Type,
+                Priority = dto.Priority,
+                Status = dto.Status,
+                Deadline = dto.Deadline,
+                AssigneeName = dto.AssigneeName
+            }).ToList();
+
+            return View(viewModels);
         }
     }
 }

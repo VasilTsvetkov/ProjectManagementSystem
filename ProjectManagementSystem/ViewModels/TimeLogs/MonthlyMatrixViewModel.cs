@@ -1,4 +1,4 @@
-﻿namespace ProjectManagementSystem.ViewModels.TimeLogs
+﻿namespace ProjectManagementSystem.Web.ViewModels.TimeLogs
 {
     using System;
     using System.Collections.Generic;

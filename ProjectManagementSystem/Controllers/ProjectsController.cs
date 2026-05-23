@@ -1,12 +1,15 @@
-﻿namespace ProjectManagementSystem.Controllers
+﻿namespace ProjectManagementSystem.Web.Controllers
 {
-    using Constants;
-    using Interfaces;
+    using BL.Constants;
+    using BL.Interfaces;
+    using BL.Models;
+    using BL.DTOs.Projects;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
-    using Models;
+    using System.Linq;
     using System.Security.Claims;
+    using System.Threading.Tasks;
     using ViewModels.Projects;
 
     [Authorize]
@@ -20,8 +23,19 @@
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Index()
         {
-            var projects = await _projectService.GetAllProjectsAsync();
-            return View(projects);
+            var dtos = await _projectService.GetAllProjectsAsync();
+
+            var viewModels = dtos.Select(dto => new ProjectDisplayViewModel
+            {
+                Id = dto.Id,
+                Number = dto.Number,
+                Name = dto.Name,
+                Tag = dto.Tag,
+                Description = dto.Description,
+                CreatedAt = dto.CreatedAt
+            }).ToList();
+
+            return View(viewModels);
         }
 
         [HttpGet("create")]
@@ -47,7 +61,13 @@
                 return Unauthorized();
             }
 
-            await _projectService.CreateProjectAsync(model, userId);
+            var dto = new ProjectDto
+            {
+                Name = model.Name,
+                Description = model.Description
+            };
+
+            await _projectService.CreateProjectAsync(dto, userId);
 
             return RedirectToAction(nameof(Index));
         }
@@ -58,8 +78,14 @@
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Edit(int id)
         {
-            var model = await _projectService.GetProjectForEditAsync(id);
-            if (model == null) return NotFound();
+            var dto = await _projectService.GetProjectForEditAsync(id);
+            if (dto == null) return NotFound();
+
+            var model = new ProjectViewModel
+            {
+                Name = dto.Name,
+                Description = dto.Description
+            };
 
             return View(model);
         }
@@ -79,7 +105,13 @@
 
             if (userId == null) return Unauthorized();
 
-            var updated = await _projectService.UpdateProjectAsync(id, model, userId);
+            var dto = new ProjectDto
+            {
+                Name = model.Name,
+                Description = model.Description
+            };
+
+            var updated = await _projectService.UpdateProjectAsync(id, dto, userId);
             if (!updated) return NotFound();
 
             return RedirectToAction(nameof(Index));

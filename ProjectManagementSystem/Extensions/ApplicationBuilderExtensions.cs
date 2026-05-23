@@ -1,6 +1,6 @@
-﻿namespace ProjectManagementSystem.Extensions
+﻿namespace ProjectManagementSystem.Web.Extensions
 {
-    using Constants;
+    using BL.Constants;
     using Serilog;
 
     public static class ApplicationBuilderExtensions

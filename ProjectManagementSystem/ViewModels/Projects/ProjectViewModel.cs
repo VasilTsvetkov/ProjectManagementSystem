@@ -1,4 +1,4 @@
-﻿namespace ProjectManagementSystem.ViewModels.Projects
+﻿namespace ProjectManagementSystem.Web.ViewModels.Projects
 {
     public class ProjectViewModel
     {

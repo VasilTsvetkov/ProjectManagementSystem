@@ -41,7 +41,7 @@
                                 <label asp-for="Type" class="form-label fw-bold small text-uppercase text-muted"></label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light"><i class="bi bi-tag"></i></span>
-                                    <select asp-for="Type" asp-items="Html.GetEnumSelectList<ProjectManagementSystem.Enums.Task.Type>()" class="form-select"></select>
+                                    <select asp-for="Type" asp-items="Html.GetEnumSelectList<Type>()" class="form-select"></select>
                                 </div>
                                 <span asp-validation-for="Type" class="text-danger small"></span>
                             </div>
@@ -49,7 +49,7 @@
                                 <label asp-for="Priority" class="form-label fw-bold small text-uppercase text-muted"></label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light"><i class="bi bi-flag"></i></span>
-                                    <select asp-for="Priority" asp-items="Html.GetEnumSelectList<ProjectManagementSystem.Enums.Task.Priority>()" class="form-select"></select>
+                                    <select asp-for="Priority" asp-items="Html.GetEnumSelectList<Priority>()" class="form-select"></select>
                                 </div>
                                 <span asp-validation-for="Priority" class="text-danger small"></span>
                             </div>

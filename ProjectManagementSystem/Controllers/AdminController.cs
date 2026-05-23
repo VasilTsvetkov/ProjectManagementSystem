@@ -1,9 +1,12 @@
-﻿namespace ProjectManagementSystem.Controllers
+﻿namespace ProjectManagementSystem.Web.Controllers
 {
-    using Constants;
-    using Interfaces;
+    using BL.Constants;
+    using BL.Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using ViewModels.Admin;
 
     [Authorize(Roles = Roles.Admin)]
     [Route("admin")]
@@ -15,8 +18,18 @@
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Index()
         {
-            var users = await _adminService.GetAllUsersWithRolesAsync();
-            return View(users);
+            var dtos = await _adminService.GetAllUsersWithRolesAsync();
+
+            var viewModels = dtos.Select(dto => new UserRoleViewModel
+            {
+                UserId = dto.UserId,
+                Email = dto.Email,
+                FullName = dto.FullName,
+                CurrentRole = dto.CurrentRole,
+                IsAdmin = dto.IsAdmin
+            }).ToList();
+
+            return View(viewModels);
         }
 
         [HttpPost("users/{userId}/change-role")]

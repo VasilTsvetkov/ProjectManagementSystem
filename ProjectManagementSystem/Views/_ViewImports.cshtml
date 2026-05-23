@@ -1,21 +1,23 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using ProjectManagementSystem
-@using ProjectManagementSystem.Constants
-@using ProjectManagementSystem.DTOs
-@using ProjectManagementSystem.Enums
-@using ProjectManagementSystem.Enums.Task
-@using ProjectManagementSystem.Helpers
-@using ProjectManagementSystem.Models
-@using ProjectManagementSystem.ViewModels
-@using ProjectManagementSystem.ViewModels.Admin
-@using ProjectManagementSystem.ViewModels.Comments
-@using ProjectManagementSystem.ViewModels.Dashboard
-@using ProjectManagementSystem.ViewModels.Home
-@using ProjectManagementSystem.ViewModels.Projects
-@using ProjectManagementSystem.ViewModels.Tasks
-@using ProjectManagementSystem.ViewModels.TimeLogs
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using System.Globalization
-@using Type = ProjectManagementSystem.Enums.Task.Type
+@using ProjectManagementSystem
+@using ProjectManagementSystem.BL.Constants
+@using ProjectManagementSystem.BL.DTOs
+@using ProjectManagementSystem.BL.Enums
+@using ProjectManagementSystem.BL.Enums.Task
+@using ProjectManagementSystem.BL.Helpers
+@using ProjectManagementSystem.BL.Models
+@using ProjectManagementSystem.Web.ViewModels
+@using ProjectManagementSystem.Web.ViewModels.Admin
+@using ProjectManagementSystem.Web.ViewModels.Comments
+@using ProjectManagementSystem.Web.ViewModels.Dashboard
+@using ProjectManagementSystem.Web.ViewModels.Home
+@using ProjectManagementSystem.Web.ViewModels.Projects
+@using ProjectManagementSystem.Web.ViewModels.Tasks
+@using ProjectManagementSystem.Web.ViewModels.TimeLogs
+
+@using Type = ProjectManagementSystem.BL.Enums.Task.Type
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager

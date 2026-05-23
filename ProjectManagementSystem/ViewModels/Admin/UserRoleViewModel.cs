@@ -1,4 +1,4 @@
-﻿namespace ProjectManagementSystem.ViewModels.Admin
+﻿namespace ProjectManagementSystem.Web.ViewModels.Admin
 {
     public class UserRoleViewModel
     {

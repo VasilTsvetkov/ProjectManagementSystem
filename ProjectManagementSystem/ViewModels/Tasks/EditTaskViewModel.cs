@@ -1,6 +1,6 @@
-﻿namespace ProjectManagementSystem.ViewModels.Tasks
+﻿namespace ProjectManagementSystem.Web.ViewModels.Tasks
 {
-    using Enums.Task;
+    using BL.Enums.Task;
 
     public class EditTaskViewModel : TaskViewModel
     {

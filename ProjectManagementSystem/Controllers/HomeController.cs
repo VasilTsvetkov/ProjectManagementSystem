@@ -1,10 +1,11 @@
-namespace ProjectManagementSystem.Controllers
+namespace ProjectManagementSystem.Web.Controllers
 {
-    using Interfaces;
+    using BL.Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using System.Security.Claims;
     using System.Diagnostics;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
     using ViewModels.Home;
 
     [Authorize]
@@ -13,7 +14,15 @@ namespace ProjectManagementSystem.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var model = await homeService.GetHomeIndexDataAsync(userId);
+            var dto = await homeService.GetHomeIndexDataAsync(userId);
+
+            var model = new IndexViewModel
+            {
+                MyPendingTasksCount = dto.MyPendingTasksCount,
+                OverdueTasksCount = dto.OverdueTasksCount,
+                UrgentTasks = dto.UrgentTasks,
+                RecentActivities = dto.RecentActivities
+            };
 
             return View(model);
         }

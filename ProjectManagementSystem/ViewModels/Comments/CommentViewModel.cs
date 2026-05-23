@@ -1,7 +1,5 @@
-﻿namespace ProjectManagementSystem.ViewModels.Comments
+﻿namespace ProjectManagementSystem.Web.ViewModels.Comments
 {
-    using System.ComponentModel.DataAnnotations;
-
     public class CommentViewModel
     {
         public required string Content { get; set; } = string.Empty;

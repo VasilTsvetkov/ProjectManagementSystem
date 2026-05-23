@@ -1,6 +1,6 @@
-﻿namespace ProjectManagementSystem.Middleware
+﻿namespace ProjectManagementSystem.Web.Middleware
 {
-    using Constants;
+    using BL.Constants;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
     using System;

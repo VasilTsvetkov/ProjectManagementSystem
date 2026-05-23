@@ -1,11 +1,11 @@
-﻿namespace ProjectManagementSystem.Areas.Identity.Pages.Account
+﻿namespace ProjectManagementSystem.Web.Areas.Identity.Pages.Account
 {
-    using Constants;
+    using BL.Constants;
+    using BL.Models;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Models;
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
 

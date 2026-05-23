@@ -1,12 +1,12 @@
-﻿namespace ProjectManagementSystem.ViewModels.Tasks
+﻿namespace ProjectManagementSystem.Web.ViewModels.Tasks
 {
+    using BL.Enums.Task;
+    using BL.Helpers;
     using Comments;
-    using Enums.Task;
-    using Helpers;
     using System;
     using System.Collections.Generic;
     using TimeLogs;
-    using Type = Enums.Task.Type;
+    using Type = BL.Enums.Task.Type;
 
     public class TaskDetailsViewModel
     {
