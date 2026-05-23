@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ProjectManagementSystem.Infrastructure\ProjectManagementSystem.BL.csproj" />
+	  <ProjectReference Include="..\ProjectManagementSystem.BL\ProjectManagementSystem.BL.csproj" />
 	</ItemGroup>
 
 </Project>
