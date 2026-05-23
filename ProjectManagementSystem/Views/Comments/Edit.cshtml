@@ -25,7 +25,7 @@
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary px-4">Save Changes</button>
-                            <a asp-controller="Tasks" asp-action="Details" asp-route-id="@Model.TaskId" class="btn btn-outline-secondary">Cancel</a>
+                            <a asp-controller="Tasks" asp-action="Details" asp-route-projectId="@Model.ProjectId" asp-route-id="@Model.TaskId" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>

@@ -14,7 +14,7 @@
             </ol>
         </nav>
         <div class="btn-group shadow-sm">
-            <a asp-action="Edit" asp-route-projectId="@Model.ProjectId" asp-route-id="@Model.Id" class="btn btn-white border btn-sm px-3">
+            <a asp-action="Edit" asp-route-projectId="@Model.ProjectId" asp-route-id="@Model.Id" class="btn btn-editable border btn-sm px-3">
                 <i class="bi bi-pencil me-1"></i> Edit
             </a>
             <a asp-action="Index" asp-route-projectId="@Model.ProjectId" class="btn btn-primary btn-sm px-3">
@@ -29,17 +29,17 @@
                 <div class="card-body p-4">
                     <div class="mb-3">
                         <partial name="_TaskTag" model="Model" />
-                        <h2 class="fw-bold mt-2">@Model.Title</h2>
+                        <h2 class="fw-bold mt-2 dynamic-text">@Model.Title</h2>
                     </div>
 
                     <h6 class="text-uppercase fw-bold text-muted small mb-2">Description</h6>
-                    <p class="text-dark lead fs-6">@Model.Description</p>
+                    <p class="dynamic-text lead fs-6">@Model.Description</p>
 
-                    <hr class="my-4" />
+                    <hr class="my-4 standard-hr" />
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0 text-dark">Time Logs</h5>
-                        <span class="badge bg-light text-dark border fw-medium px-3 py-2">Total: @Model.FormattedTotalHours</span>
+                        <h5 class="fw-bold mb-0 dynamic-text">Time Logs</h5>
+                        <span class="badge contextual-badge border fw-medium px-3 py-2">Total: @Model.FormattedTotalHours</span>
                     </div>
 
                     @if (TempData[NotificationKeys.Error] != null)
@@ -50,7 +50,7 @@
                         </div>
                     }
 
-                    <div class="bg-light rounded p-3 mb-4 border border-dashed">
+                    <div class="contextual-bg rounded p-3 mb-4 border border-dashed">
                         <form asp-controller="TimeLogs" asp-action="Create" method="post">
                             <input type="hidden" name="TaskId" value="@Model.Id" />
                             <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
@@ -86,21 +86,21 @@
                     @if (!Model.TimeLogs.Any())
                     {
                         <div class="text-center py-4 opacity-50">
-                            <i class="bi bi-clock-history fs-2"></i>
-                            <p class="small mt-1">No time logs recorded.</p>
+                            <i class="bi bi-clock-history fs-2 text-muted"></i>
+                            <p class="small mt-1 text-muted">No time logs recorded.</p>
                         </div>
                     }
                     else
                     {
-                        <div class="list-group list-group-flush border-top">
+                        <div class="list-group list-group-flush border-top standard-hr">
                             @foreach (var log in Model.TimeLogs)
                             {
-                                <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                                <div class="list-group-item bg-transparent px-0 py-3 d-flex justify-content-between align-items-center standard-hr">
                                     <div>
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="fw-bold text-primary">@log.FormattedHours</span>
                                             <span class="text-muted small">•</span>
-                                            <span class="small fw-medium text-dark">@log.Date.ToString(TimeConfig.DateDisplayFormat)</span>
+                                            <span class="small fw-medium dynamic-text">@log.Date.ToString(TimeConfig.DateDisplayFormat)</span>
                                         </div>
                                         @if (!string.IsNullOrEmpty(log.Description))
                                         {
@@ -124,13 +124,13 @@
 
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4 text-dark">Comments</h5>
+                    <h5 class="fw-bold mb-4 dynamic-text">Comments</h5>
 
                     <form asp-controller="Comments" asp-action="Create" method="post" class="mb-4">
                         <input type="hidden" name="TaskId" value="@Model.Id" />
                         <input type="hidden" name="ProjectId" value="@Model.ProjectId" />
                         <div class="mb-2">
-                            <textarea name="Content" class="form-control bg-light border-0" rows="3" placeholder="Write a comment..." required></textarea>
+                            <textarea name="Content" class="form-control contextual-bg border-0" rows="3" placeholder="Write a comment..." required></textarea>
                         </div>
                         <div class="text-end">
                             <button type="submit" class="btn btn-primary btn-sm px-4 shadow-sm">Post Comment</button>
@@ -145,12 +145,12 @@
                                     @comment.AuthorName.Substring(0, 1).ToUpper()
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div class="bg-light rounded p-3 position-relative">
+                                    <div class="contextual-bg rounded p-3 position-relative">
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span class="fw-bold small text-dark">@comment.AuthorName</span>
+                                            <span class="fw-bold small dynamic-text">@comment.AuthorName</span>
                                             <span class="text-muted" style="font-size: 0.75rem;">@comment.CreatedAt.ToString(TimeConfig.DateTimeDisplayFormat)</span>
                                         </div>
-                                        <p class="mb-0 small text-dark">@comment.Content</p>
+                                        <p class="mb-0 small dynamic-text">@comment.Content</p>
                                     </div>
                                     @if (comment.CanEdit)
                                     {
@@ -185,13 +185,13 @@
                     <div class="row g-3 mb-4">
                         <div class="col-6">
                             <label class="text-muted small d-block mb-1 fw-bold text-uppercase">Type</label>
-                            <div class="fw-bold text-dark text-truncate">
+                            <div class="fw-bold dynamic-text text-truncate">
                                 <i class="bi bi-tag-fill text-muted me-1"></i>@Model.Type
                             </div>
                         </div>
                         <div class="col-6">
                             <label class="text-muted small d-block mb-1 fw-bold text-uppercase">Priority</label>
-                            <div class="fw-bold text-dark">
+                            <div class="fw-bold dynamic-text">
                                 <i class="bi bi-flag-fill text-muted me-1"></i>@Model.Priority
                             </div>
                         </div>
@@ -199,28 +199,28 @@
 
                     <div class="mb-4">
                         <label class="text-muted small d-block mb-1 fw-bold text-uppercase">Deadline</label>
-                        <div class="fw-bold @(Model.Deadline < DateTime.UtcNow ? "text-danger" : "text-dark")">
+                        <div class="fw-bold @(Model.Deadline < DateTime.UtcNow ? "text-danger" : "dynamic-text")">
                             <i class="bi bi-calendar-x me-1"></i>@(Model.Deadline?.ToString(TimeConfig.DateDisplayFormat) ?? "-")
                         </div>
                     </div>
 
-                    <hr class="my-4" />
+                    <hr class="my-4 standard-hr" />
 
                     <div class="mb-3">
                         <label class="text-muted small d-block mb-2 fw-bold text-uppercase">Assignee</label>
                         <div class="d-flex align-items-center gap-2">
-                            <div class="bg-light border rounded-circle p-1">
+                            <div class="contextual-bg border rounded-circle p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                                 <i class="bi bi-person fs-5 text-muted"></i>
                             </div>
-                            <span class="fw-bold text-dark">@(Model.AssigneeName ?? MessageConstants.Unassigned)</span>
+                            <span class="fw-bold dynamic-text">@(Model.AssigneeName ?? MessageConstants.Unassigned)</span>
                         </div>
                     </div>
 
                     <div>
                         <label class="text-muted small d-block mb-2 fw-bold text-uppercase">Reporter</label>
                         <div class="d-flex align-items-center gap-2 opacity-75">
-                            <i class="bi bi-megaphone small"></i>
-                            <span class="small text-dark">@Model.ReporterName</span>
+                            <i class="bi bi-megaphone small text-muted"></i>
+                            <span class="small dynamic-text">@Model.ReporterName</span>
                         </div>
                     </div>
                 </div>
@@ -230,8 +230,15 @@
 </div>
 
 <style>
-    .btn-white {
+    .btn-editable {
         background: #fff;
+        color: #212529;
+    }
+
+    [data-theme="dark"] .btn-editable {
+        background: #2b2b2b;
+        color: #e0e0e0;
+        border-color: #444 !important;
     }
 
     .border-dashed {
@@ -252,5 +259,49 @@
 
     .breadcrumb-item + .breadcrumb-item::before {
         content: "›";
+    }
+
+    .dynamic-text {
+        color: #212529;
+    }
+
+    [data-theme="dark"] .dynamic-text {
+        color: #e0e0e0 !important;
+    }
+
+    .contextual-bg {
+        background-color: #f8f9fa !important;
+    }
+
+    [data-theme="dark"] .contextual-bg {
+        background-color: #232323 !important;
+        border-color: #3a3a3a !important;
+    }
+
+    .contextual-badge {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+
+    [data-theme="dark"] .contextual-badge {
+        background-color: transparent;
+        color: #e0e0e0 !important;
+        border-color: #444 !important;
+    }
+
+    .standard-hr {
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .standard-hr {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    [data-theme="dark"] .breadcrumb-item a {
+        color: #6ea8fe;
+    }
+
+    [data-theme="dark"] .breadcrumb-item.active {
+        color: #a2acb8;
     }
 </style>
