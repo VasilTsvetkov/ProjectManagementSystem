@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using ProjectManagementSystem.BL.Data;
 namespace ProjectManagementSystem.Web
 {
     using BL.Extensions;
@@ -16,21 +19,35 @@ namespace ProjectManagementSystem.Web
                 builder.Host.ConfigureSerilog();
 
                 builder.Services.AddDatabase(builder.Configuration);
-                builder.Services.AddIdentityServices();
+                builder.Services.AddWebIdentityServices();
                 builder.Services.AddRepositories();
                 builder.Services.AddApplicationServices();
                 builder.Services.AddControllersWithViews();
 
                 var app = builder.Build();
 
-                app.UseMiddleware<ExceptionHandlingMiddleware>();
-
-                using (var scope = app.Services.CreateScope())
+                if (!app.Environment.IsDevelopment())
                 {
-                    await scope.ServiceProvider.SeedRolesAndAdminAsync();
+                    app.UseHsts();
                 }
 
-                app.UseMiddlewarePipeline();
+                app.UseHttpsRedirection();
+                app.UseStaticFiles();
+
+                app.UseRouting();
+
+                app.UseAuthentication();
+                app.UseAuthorization();
+
+                app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+                await app.Services.SeedRolesAndAdminAsync();
+
+                app.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                app.MapRazorPages();
 
                 Log.Information("Application started successfully");
 

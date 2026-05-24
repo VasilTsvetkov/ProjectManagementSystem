@@ -1,41 +1,34 @@
 ﻿namespace ProjectManagementSystem.Web.Extensions
 {
-    using BL.Constants;
+    using BL.Data;
+    using BL.Models;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
     using Serilog;
 
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseMiddlewarePipeline(this IApplicationBuilder app)
+        public static IServiceCollection AddWebIdentityServices(this IServiceCollection services)
         {
-            var env = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseMigrationsEndPoint();
-            }
-            else
-            {
-                app.UseExceptionHandler(RouteConstants.ErrorPath);
-                app.UseHsts();
-            }
+            return services;
+        }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseSerilogRequestLogging();
-            app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
+        public static void ConfigureSerilog(this IHostBuilder host)
+        {
+            host.UseSerilog((context, loggerConfiguration) =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapRazorPages();
+                loggerConfiguration
+                    .Enrich.FromLogContext()
+                    .Enrich.WithEnvironmentName()
+                    .Enrich.WithThreadId();
+
+                loggerConfiguration.ReadFrom.Configuration(context.Configuration);
             });
-
-            return app;
         }
     }
 }

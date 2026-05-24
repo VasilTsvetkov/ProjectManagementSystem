@@ -7,10 +7,8 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
     using ProjectManagementSystem.BL.Models;
     using Repositories;
-    using Serilog;
     using Services;
     using System;
     using System.Threading.Tasks;
@@ -26,15 +24,6 @@
                     sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             services.AddDatabaseDeveloperPageExceptionFilter();
-
-            return services;
-        }
-
-        public static IServiceCollection AddIdentityServices(this IServiceCollection services)
-        {
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             return services;
         }
@@ -62,19 +51,6 @@
             services.AddScoped<ITimeLogRepository, TimeLogRepository>();
 
             return services;
-        }
-
-        public static void ConfigureSerilog(this IHostBuilder host)
-        {
-            host.UseSerilog((context, loggerConfiguration) =>
-            {
-                loggerConfiguration
-                    .Enrich.FromLogContext()
-                    .Enrich.WithMachineName()
-                    .Enrich.WithThreadId();
-
-                loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-            });
         }
 
         public static async Task SeedRolesAndAdminAsync(this IServiceProvider serviceProvider)
