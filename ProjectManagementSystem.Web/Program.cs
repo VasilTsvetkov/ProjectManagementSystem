@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using ProjectManagementSystem.BL.Data;
 namespace ProjectManagementSystem.Web
 {
     using BL.Extensions;

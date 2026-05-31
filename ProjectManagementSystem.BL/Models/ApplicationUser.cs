@@ -1,7 +1,7 @@
 ﻿namespace ProjectManagementSystem.BL.Models
 {
+    using Constants;
     using Microsoft.AspNetCore.Identity;
-    using ProjectManagementSystem.BL.Constants;
 
     public class ApplicationUser : IdentityUser
     {

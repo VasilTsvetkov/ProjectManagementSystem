@@ -1,5 +1,6 @@
 ﻿namespace ProjectManagementSystem.BL.Extensions
 {
+    using BL.Models;
     using Constants;
     using Data;
     using Interfaces;
@@ -7,7 +8,6 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using ProjectManagementSystem.BL.Models;
     using Repositories;
     using Services;
     using System;
