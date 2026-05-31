@@ -1,0 +1,40 @@
+﻿@page
+@model ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Resend email confirmation";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-3">@ViewData["Title"]</h2>
+                    <p class="text-center text-muted small mb-4">
+                        Missing your verification link? Enter your email below to request a new one.
+                    </p>
+
+                    <form method="post">
+                        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Input.Email" class="form-label">Email Address</label>
+                            <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="name@example.com" />
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="w-100 btn btn-primary btn-lg mb-3">Resend Verification</button>
+                    </form>
+
+                    <div class="text-center small">
+                        <a asp-page="./Login" class="text-decoration-none">Back to Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
