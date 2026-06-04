@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using Models;
+    using System.Reflection.Emit;
 
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
@@ -15,6 +16,14 @@
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.HasSequence<int>("ProjectNumberSequence", schema: "shared")
+                .StartsAt(1)
+                .IncrementsBy(1);
+
+            builder.Entity<Project>()
+                .Property(p => p.Number)
+                .HasDefaultValueSql("NEXT VALUE FOR shared.ProjectNumberSequence");
 
             builder.Entity<Comment>()
                 .HasOne(c => c.Task)

@@ -22,6 +22,8 @@ namespace ProjectManagementSystem.BL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.HasSequence<int>("ProjectNumberSequence", "shared");
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -313,7 +315,9 @@ namespace ProjectManagementSystem.BL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Number")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR shared.ProjectNumberSequence");
 
                     b.HasKey("Id");
 

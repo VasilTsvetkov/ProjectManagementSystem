@@ -12,7 +12,7 @@ using ProjectManagementSystem.BL.Data;
 namespace ProjectManagementSystem.BL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260523123611_InitialCreate")]
+    [Migration("20260604191129_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,6 +24,8 @@ namespace ProjectManagementSystem.BL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.HasSequence<int>("ProjectNumberSequence", "shared");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -316,7 +318,9 @@ namespace ProjectManagementSystem.BL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Number")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR shared.ProjectNumberSequence");
 
                     b.HasKey("Id");
 
