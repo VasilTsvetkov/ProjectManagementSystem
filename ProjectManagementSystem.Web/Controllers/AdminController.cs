@@ -2,6 +2,7 @@
 {
     using BL.Constants;
     using BL.Interfaces;
+    using Microsoft.AspNetCore.Antiforgery;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using System.Linq;
@@ -32,24 +33,30 @@
             return View(viewModels);
         }
 
-        [HttpPost("users/{userId}/change-role")]
-        [ValidateAntiForgeryToken]
-        [ProducesResponseType(StatusCodes.Status302Found)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpPost("users/ChangeRole")]
+        [IgnoreAntiforgeryToken]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ChangeRole(string userId, string newRole)
         {
-            var (success, message) = await _adminService.ChangeUserRoleAsync(userId, newRole);
-
-            if (success)
+            var antiforgery = HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
+            try
             {
-                TempData[NotificationKeys.Success] = message;
+                await antiforgery.ValidateRequestAsync(HttpContext);
             }
-            else
+            catch (AntiforgeryValidationException)
             {
-                TempData[NotificationKeys.Error] = message;
+                return BadRequest("Invalid security token.");
             }
 
-            return RedirectToAction(nameof(Index));
+            var (success, _) = await _adminService.ChangeUserRoleAsync(userId, newRole);
+
+            if (!success)
+            {
+                return BadRequest("Could not update user role.");
+            }
+
+            return Ok();
         }
     }
 }

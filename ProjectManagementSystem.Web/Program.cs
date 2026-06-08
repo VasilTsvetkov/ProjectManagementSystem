@@ -20,6 +20,10 @@ namespace ProjectManagementSystem.Web
                 builder.Services.AddRepositories();
                 builder.Services.AddApplicationServices();
                 builder.Services.AddControllersWithViews();
+                builder.Services.AddAntiforgery(options =>
+                {
+                    options.HeaderName = "X-XSRF-TOKEN";
+                });
 
                 var app = builder.Build();
 
@@ -28,6 +32,10 @@ namespace ProjectManagementSystem.Web
                     app.UseHsts();
                 }
 
+                app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+                app.UseStatusCodePagesWithReExecute("/Home/Error/{0}");
+
                 app.UseHttpsRedirection();
                 app.UseStaticFiles();
 
@@ -35,8 +43,6 @@ namespace ProjectManagementSystem.Web
 
                 app.UseAuthentication();
                 app.UseAuthorization();
-
-                app.UseMiddleware<ExceptionHandlingMiddleware>();
 
                 await app.Services.SeedRolesAndAdminAsync();
 

@@ -28,7 +28,7 @@
         private static Task HandleExceptionAsync(HttpContext context)
         {
             var isAjax = string.Equals(context.Request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.OrdinalIgnoreCase) ||
-                 context.Request.Path.StartsWithSegments("/api");
+                         context.Request.Path.StartsWithSegments("/api");
 
             if (isAjax)
             {

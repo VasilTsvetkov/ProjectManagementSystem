@@ -4,6 +4,10 @@
     ViewData["Title"] = "User Management";
 }
 
+<div id="antiforgery-container" class="d-none">
+    @Html.AntiForgeryToken()
+</div>
+
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="bi bi-people-fill me-2"></i>User Management</h2>
@@ -66,14 +70,12 @@
                                 }
                                 else
                                 {
-                                    <form asp-action="ChangeRole" asp-route-userId="@user.UserId" method="post" class="d-inline-flex justify-content-end">
-                                        <select name="newRole"
-                                                class="form-select form-select-sm w-auto me-2"
-                                                onchange="return confirmRoleChange(this)">
-                                            <option value="@Roles.Member" selected="@(user.CurrentRole == Roles.Member)">Member</option>
-                                            <option value="@Roles.Manager" selected="@(user.CurrentRole == Roles.Manager)">Manager</option>
-                                        </select>
-                                    </form>
+                                    <select class="form-select form-select-sm w-auto d-inline-block"
+                                            data-user-id="@user.UserId"
+                                            onchange="updateUserRole(this)">
+                                        <option value="@Roles.Member" selected="@(user.CurrentRole == Roles.Member)">Member</option>
+                                        <option value="@Roles.Manager" selected="@(user.CurrentRole == Roles.Manager)">Manager</option>
+                                    </select>
                                 }
                             </td>
                         </tr>
@@ -86,13 +88,38 @@
 
 @section Scripts {
     <script>
-        function confirmRoleChange(selectElement) {
-            const role = selectElement.value;
-            if (confirm(`Are you sure you want to change this user to ${role}?`)) {
-                selectElement.form.submit();
-            } else {
-                location.reload();
-            }
+        function updateUserRole(selectElement) {
+            const userId = selectElement.getAttribute("data-user-id");
+            const newRole = selectElement.value;
+            const row = selectElement.closest("tr");
+            const badgeContainer = row.querySelector("td:nth-child(3)");
+            const originalBadgeHtml = badgeContainer.innerHTML;
+
+            const token = document.querySelector('#antiforgery-container input[name="__RequestVerificationToken"]').value;
+
+            badgeContainer.innerHTML = `<span class="badge rounded-pill bg-secondary opacity-75">Updating...</span>`;
+
+            fetch(`/admin/users/ChangeRole?userId=${userId}&newRole=${newRole}`, {
+                method: 'POST',
+                headers: {
+                    'X-XSRF-TOKEN': token
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        if (newRole === "Manager") {
+                            badgeContainer.innerHTML = `<span class="badge rounded-pill bg-warning text-dark">Manager</span>`;
+                        } else {
+                            badgeContainer.innerHTML = `<span class="badge rounded-pill bg-info text-dark">Member</span>`;
+                        }
+                    } else {
+                        throw new Error();
+                    }
+                })
+                .catch(() => {
+                    badgeContainer.innerHTML = originalBadgeHtml;
+                    selectElement.value = selectElement.querySelector('option[selected]').value;
+                });
         }
     </script>
 }
