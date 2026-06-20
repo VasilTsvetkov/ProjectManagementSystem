@@ -2,15 +2,23 @@
 
 @{
     var color = ColorHelper.GetTaskColor(Model.Tag);
+
+    string? iconClass = Model.Type switch
+    {
+        Type.Bug => "bi-bug text-danger",
+        Type.Feature => "bi-star-fill text-success",
+        Type.Task => "bi-check-square-fill text-primary",
+        _ => null
+    };
 }
 
 <span class="d-inline-flex align-items-center gap-2">
-    @if (!string.IsNullOrEmpty(Model.TypeIcon))
+    @if (!string.IsNullOrEmpty(iconClass))
     {
-        <i class="bi @Model.TypeIcon text-muted" title="Task Type"></i>
+        <i class="bi @iconClass" title="Task Type"></i>
     }
-    
-    <span class="badge rounded-pill shadow-sm fw-bold" 
+
+    <span class="badge rounded-pill shadow-sm fw-bold"
           style="background-color: @color; letter-spacing: 0.5px; font-size: 0.75rem;">
         @Model.Tag
     </span>

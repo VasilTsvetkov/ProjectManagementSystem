@@ -1,9 +1,9 @@
 ﻿namespace ProjectManagementSystem.Web.Controllers
 {
     using BL.Constants;
+    using BL.DTOs.Projects;
     using BL.Interfaces;
     using BL.Models;
-    using BL.DTOs.Projects;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;

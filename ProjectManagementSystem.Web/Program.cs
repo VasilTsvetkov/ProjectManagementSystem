@@ -20,10 +20,7 @@ namespace ProjectManagementSystem.Web
                 builder.Services.AddRepositories();
                 builder.Services.AddApplicationServices();
                 builder.Services.AddControllersWithViews();
-                builder.Services.AddAntiforgery(options =>
-                {
-                    options.HeaderName = "X-XSRF-TOKEN";
-                });
+                builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
                 var app = builder.Build();
 

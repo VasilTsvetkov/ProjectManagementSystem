@@ -1,20 +1,19 @@
 ﻿namespace ProjectManagementSystem.Web.Controllers
 {
     using BL.Constants;
+    using BL.DTOs.Tasks;
     using BL.Enums.Task;
     using BL.Interfaces;
     using BL.Models;
-    using BL.DTOs.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using System.Collections.Generic;
-    using System.Linq;
-    using ViewModels.Tasks;
     using ViewModels.Comments;
+    using ViewModels.Tasks;
     using ViewModels.TimeLogs;
 
     [Authorize]
