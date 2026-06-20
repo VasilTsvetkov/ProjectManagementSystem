@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -359,6 +360,12 @@ namespace ProjectManagementSystem.BL.Migrations
                 name: "IX_Projects_CreatorId",
                 table: "Projects",
                 column: "CreatorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_Number",
+                table: "Projects",
+                column: "Number",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tasks_AssigneeId",

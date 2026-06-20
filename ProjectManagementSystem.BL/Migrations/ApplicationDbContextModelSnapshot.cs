@@ -323,6 +323,9 @@ namespace ProjectManagementSystem.BL.Migrations
 
                     b.HasIndex("CreatorId");
 
+                    b.HasIndex("Number")
+                        .IsUnique();
+
                     b.ToTable("Projects");
                 });
 

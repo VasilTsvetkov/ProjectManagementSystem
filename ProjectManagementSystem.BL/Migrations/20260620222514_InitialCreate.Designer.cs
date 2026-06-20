@@ -12,7 +12,7 @@ using ProjectManagementSystem.BL.Data;
 namespace ProjectManagementSystem.BL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260604191129_InitialCreate")]
+    [Migration("20260620222514_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -325,6 +325,9 @@ namespace ProjectManagementSystem.BL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatorId");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
 
                     b.ToTable("Projects");
                 });

@@ -86,29 +86,29 @@
         }
 
         [Fact]
-        public async Task AddAsync_IncrementsMaxProjectNumberByOne()
+        public async Task AddAsync_SavesProjectSuccessfullyToDatabase()
         {
-            var p1 = new Project { Id = 1, Number = 42, Name = "P1", CreatorId = "u1", CreatedAt = DateTime.UtcNow };
-            await _context.Projects.AddAsync(p1);
-            await _context.SaveChangesAsync();
+            var newProject = new Project { Id = 2, Number = 43, Name = "P2", CreatorId = "u1", CreatedAt = DateTime.UtcNow };
 
-            var newProject = new Project { Id = 2, Name = "P2", CreatorId = "u1", CreatedAt = DateTime.UtcNow };
             await _repository.AddAsync(newProject);
 
             var dbProject = await _context.Projects.FindAsync(2);
             Assert.NotNull(dbProject);
+            Assert.Equal("P2", dbProject.Name);
             Assert.Equal(43, dbProject.Number);
         }
 
         [Fact]
-        public async Task AddAsync_SetsNumberToOne_WhenNoProjectsExist()
+        public async Task AddAsync_PersistsProjectFieldsCorrectly()
         {
-            var newProject = new Project { Id = 1, Name = "P1", CreatorId = "u1", CreatedAt = DateTime.UtcNow };
+            var newProject = new Project { Id = 1, Number = 1, Name = "P1", CreatorId = "u1", CreatedAt = DateTime.UtcNow };
+
             await _repository.AddAsync(newProject);
 
             var dbProject = await _context.Projects.FindAsync(1);
             Assert.NotNull(dbProject);
             Assert.Equal(1, dbProject.Number);
+            Assert.Equal("P1", dbProject.Name);
         }
 
         [Fact]

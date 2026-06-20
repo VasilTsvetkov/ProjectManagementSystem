@@ -24,6 +24,10 @@
                 .Property(p => p.Number)
                 .HasDefaultValueSql("NEXT VALUE FOR shared.ProjectNumberSequence");
 
+            builder.Entity<Project>()
+                .HasIndex(p => p.Number)
+                .IsUnique();
+
             builder.Entity<Comment>()
                 .HasOne(c => c.Task)
                 .WithMany(t => t.Comments)

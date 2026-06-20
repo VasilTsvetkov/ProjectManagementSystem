@@ -23,11 +23,6 @@
 
         public override async Task AddAsync(Project entity)
         {
-            var maxNumber = await _context.Projects
-                .MaxAsync(p => (int?)p.Number) ?? 0;
-
-            entity.Number = maxNumber + 1;
-
             await _context.Projects.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
